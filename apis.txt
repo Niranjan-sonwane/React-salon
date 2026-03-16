@@ -1,0 +1,275 @@
+APPOINTMENT PAGE API DATA REQUIREMENTS
+======================================
+
+Source UI: react-app/src/pages/AppointmentPage.jsx
+Purpose: Define all data needed from APIs to make the Appointment page work correctly.
+
+--------------------------------------------------
+1) CORE ENTITIES
+--------------------------------------------------
+
+1. Service
+Required to populate the service dropdown and service summary sections.
+
+Fields:
+- id: string (stable unique id)
+- slug: string (url-safe key)
+- title: string (display name, used in dropdown)
+- durationLabel: string (example: "30-45 min")
+- dailyCapacity: number (slots allowed per day)
+- isActive: boolean
+- category: string (example: "nails", "lashes", etc.)
+
+Optional but useful:
+- shortDescription: string
+- imageUrl: string
+- displayOrder: number
+
+
+2. BusinessHours
+Required to show "Shop Time" and to validate time slot selection.
+
+Fields:
+- timezone: string (example: "Asia/Kolkata")
+- openTime: string (24h HH:mm, example: "10:30")
+- closeTime: string (24h HH:mm, example: "21:00")
+- weeklyOffDays: number[] (0=Sun ... 6=Sat)
+
+Optional:
+- specialHours: array of
+  - date: string (YYYY-MM-DD)
+  - openTime: string | null
+  - closeTime: string | null
+  - isClosed: boolean
+
+
+3. BookingRule
+Required to show booking lead-time message and enforce booking policy.
+
+Fields:
+- weekdayMinLeadMinutes: number (example: 30)
+- weekdayMaxLeadMinutes: number (example: 60)
+- weekendMinLeadDays: number (example: 1)
+- allowPastDateBooking: boolean
+
+Optional:
+- policyMessageWeekday: string
+- policyMessageWeekend: string
+
+
+4. Appointment
+Required for create booking and collision detection.
+
+Fields:
+- id: string
+- customerName: string
+- customerPhone: string
+- customerEmail: string
+- serviceId: string
+- serviceTitle: string
+- date: string (YYYY-MM-DD)
+- time: string (HH:mm)
+- message: string
+- status: string ("pending" | "confirmed" | "cancelled")
+- createdAt: string (ISO datetime)
+
+Server-side only recommended:
+- normalizedServiceKey: string (lowercased/normalized for conflict checks)
+
+
+--------------------------------------------------
+2) REQUIRED API ENDPOINTS
+--------------------------------------------------
+
+A) GET /api/services
+Use: populate service dropdown.
+
+Response 200:
+{
+  "data": [
+    {
+      "id": "svc_nails",
+      "slug": "nails",
+      "title": "Nails",
+      "durationLabel": "30-45 min",
+      "dailyCapacity": 3,
+      "isActive": true,
+      "category": "nails"
+    }
+  ]
+}
+
+
+B) GET /api/appointments/day-summary?date=YYYY-MM-DD
+Use: right panel "Day Summary" and booked/available counts.
+
+Response 200:
+{
+  "date": "2026-03-16",
+  "totalCapacity": 16,
+  "totalBooked": 7,
+  "available": 9,
+  "byService": [
+    {
+      "serviceId": "svc_gel_polish",
+      "serviceTitle": "Gel Polish",
+      "booked": 2,
+      "capacity": 3
+    }
+  ]
+}
+
+
+C) GET /api/appointments/calendar-summary?month=YYYY-MM
+Use: calendar cell labels like "X booked" per day.
+
+Response 200:
+{
+  "month": "2026-03",
+  "days": [
+    { "date": "2026-03-01", "booked": 5 },
+    { "date": "2026-03-02", "booked": 9 }
+  ]
+}
+
+
+D) GET /api/booking-rules
+Use: display and enforce lead-time rules (weekday/weekend).
+
+Response 200:
+{
+  "timezone": "Asia/Kolkata",
+  "weekdayMinLeadMinutes": 30,
+  "weekdayMaxLeadMinutes": 60,
+  "weekendMinLeadDays": 1,
+  "allowPastDateBooking": false,
+  "policyMessageWeekday": "Weekday booking allowed 30-60 minutes prior.",
+  "policyMessageWeekend": "Weekend booking requires at least 1 day advance."
+}
+
+
+E) GET /api/business-hours
+Use: show shop timing and validate available times.
+
+Response 200:
+{
+  "timezone": "Asia/Kolkata",
+  "openTime": "10:30",
+  "closeTime": "21:00",
+  "weeklyOffDays": [],
+  "specialHours": []
+}
+
+
+F) POST /api/appointments
+Use: submit the appointment form.
+
+Request body:
+{
+  "customerName": "string (required)",
+  "customerPhone": "string (required)",
+  "customerEmail": "string (required, valid email)",
+  "serviceId": "string (required)",
+  "date": "YYYY-MM-DD (required)",
+  "time": "HH:mm (required)",
+  "message": "string (required)"
+}
+
+Validation rules:
+- date and time must be within business hours and policy lead time.
+- serviceId must exist and be active.
+- reject duplicate slot for same date + time + serviceId if capacity is full.
+
+Success 201:
+{
+  "success": true,
+  "appointment": {
+    "id": "apt_123",
+    "status": "confirmed",
+    "date": "2026-03-16",
+    "time": "14:30"
+  },
+  "message": "Appointment slot reserved for Monday, March 16, 2026 at 14:30."
+}
+
+Conflict 409:
+{
+  "success": false,
+  "code": "SLOT_UNAVAILABLE",
+  "message": "This slot is already booked for the day. Choose a different time slot or book for another day."
+}
+
+Validation error 422:
+{
+  "success": false,
+  "code": "VALIDATION_ERROR",
+  "errors": {
+    "customerName": "Required",
+    "customerEmail": "Invalid email"
+  }
+}
+
+
+G) OPTIONAL: GET /api/appointments/available-slots?date=YYYY-MM-DD&serviceId=...
+Use: if you want to replace free text time input with selectable valid slots.
+
+Response 200:
+{
+  "date": "2026-03-16",
+  "serviceId": "svc_nails",
+  "slots": [
+    { "time": "10:30", "available": true },
+    { "time": "11:00", "available": false },
+    { "time": "11:30", "available": true }
+  ]
+}
+
+
+--------------------------------------------------
+3) FRONTEND FORM -> API FIELD MAPPING
+--------------------------------------------------
+
+UI field name (AppointmentPage) -> API field
+- name -> customerName
+- phone -> customerPhone
+- email -> customerEmail
+- service (title selected today) -> serviceId (preferred) or serviceTitle
+- date -> date (YYYY-MM-DD)
+- time -> time (HH:mm)
+- message -> message
+
+Important recommendation:
+- Send serviceId instead of service title to avoid duplicates/typos.
+- Keep a server-side unique rule by date + time + serviceId + status in [pending, confirmed].
+
+
+--------------------------------------------------
+4) MINIMUM DATA REQUIRED TO RENDER PAGE PROPERLY
+--------------------------------------------------
+
+At initial page load, frontend should fetch:
+1. services
+2. business-hours
+3. booking-rules
+4. current month calendar-summary
+5. selected date day-summary
+
+On date change:
+- fetch day-summary for selected date
+- optionally fetch available-slots for selected service/date
+
+On form submit:
+- call POST /api/appointments
+- if success: refresh selected day-summary and calendar day count
+- if conflict: show server conflict message
+
+
+--------------------------------------------------
+5) SUGGESTED API PERFORMANCE + INTEGRITY RULES
+--------------------------------------------------
+
+- Use server timezone consistently for all date/time comparisons.
+- Store date and time separately or normalized datetime in UTC with timezone metadata.
+- Enforce atomic capacity check in database transaction to prevent double booking.
+- Return normalized error codes (SLOT_UNAVAILABLE, VALIDATION_ERROR) for reliable UI handling.
+- Include CORS and rate limiting on POST /api/appointments.
