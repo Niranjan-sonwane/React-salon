@@ -1,321 +1,561 @@
 import { useState } from "react"
-import { services } from "../data/services"
+import { services as ALL_SERVICES } from "../data/services"
+import { useBooking } from "../context/BookingContext"
 
-/* ---------- CONSTANT DATA ---------- */
-
-const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-
-const NAIL_SERVICES = [
-  { title: "Gel Polish", duration: "30–45 min", capacity: 3 },
-  { title: "Gel Overlay", duration: "45–60 min", capacity: 2 },
-  { title: "Temporary Extension", duration: "1 hr 30 min", capacity: 1 },
-  { title: "Gel Extension", duration: "1 hr 30 min – 2 hr 30 min", capacity: 2 },
-  { title: "Acrylic Extension", duration: "1 hr 30 min – 2 hr 30 min", capacity: 2 },
-  { title: "Refilling", duration: "1 hr 30 min", capacity: 1 },
-  { title: "Removal", duration: "30 min", capacity: 1 },
-  { title: "Nail Art Per Tip", duration: "10–12 min", capacity: 4 }
-]
-
-const TOTAL_CAPACITY = NAIL_SERVICES.reduce((a, b) => a + b.capacity, 0)
-
-/* ---------- HELPER FUNCTIONS ---------- */
-
+/* ─────────────── helpers ─────────────── */
 const pad = (v) => String(v).padStart(2, "0")
-
 const getDateKey = (date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 
 const readableDate = (key) => {
+  if (!key) return ""
   const [y, m, d] = key.split("-")
   return new Date(y, m - 1, d).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric"
+    weekday: "long", month: "long", day: "numeric", year: "numeric",
   })
-}
-
-const getLeadMessage = (key) => {
-  const [y, m, d] = key.split("-")
-  const day = new Date(y, m - 1, d).getDay()
-  return day === 0 || day === 6
-    ? "Weekend booking requires at least 1 day advance."
-    : "Weekday booking allowed 30–60 minutes prior."
-}
-
-const getBookings = (key) => {
-  const [y, m, d] = key.split("-")
-  const date = new Date(y, m - 1, d)
-
-  const bookings = NAIL_SERVICES.map((s, i) => {
-    const spread = (date.getDate() + date.getDay() + i * 2) % (s.capacity + 2)
-    return { ...s, booked: Math.min(s.capacity, spread) }
-  }).filter((s) => s.booked > 0)
-
-  const totalBooked = bookings.reduce((a, b) => a + b.booked, 0)
-
-  return {
-    bookings,
-    totalBooked,
-    available: Math.max(TOTAL_CAPACITY - totalBooked, 0)
-  }
 }
 
 const buildCalendar = (date) => {
   const year = date.getFullYear()
   const month = date.getMonth()
-
   const firstDay = new Date(year, month, 1).getDay()
   const days = new Date(year, month + 1, 0).getDate()
-
   const cells = []
-
   for (let i = 0; i < firstDay; i++) cells.push(null)
   for (let d = 1; d <= days; d++) cells.push(new Date(year, month, d))
   while (cells.length % 7 !== 0) cells.push(null)
-
   return cells
 }
 
-/* ---------- MAIN COMPONENT ---------- */
+const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
+/* ─────────────── component ─────────────── */
 export default function AppointmentPage() {
-  const today = new Date()
-  const todayKey = getDateKey(today)
+  const today         = new Date()
+  const todayKey      = getDateKey(today)
+  const calendar      = buildCalendar(today)
 
-  const [selectedDate, setSelectedDate] = useState(todayKey)
-  const [submitState, setSubmitState] = useState({ type: "idle", message: "" })
-  const [confirmedBookings, setConfirmedBookings] = useState([])
+  const {
+    getDayConfig,
+    getDateBookings,
+    getSlotRemaining,
+    addBooking,
+    BASE_SERVICES,
+  } = useBooking()
 
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    service: "Nails",
-    date: todayKey,
-    time: "",
-    email: "",
-    message: ""
-  })
+  /* wizard step */
+  const [step, setStep]           = useState(1)
 
-  const calendar = buildCalendar(today)
-  const extraBookingsByDate = confirmedBookings.reduce((acc, booking) => {
-    acc[booking.date] = (acc[booking.date] || 0) + 1
-    return acc
-  }, {})
+  /* selections */
+  const [dateKey, setDateKey]     = useState(todayKey)
+  const [serviceId, setServiceId] = useState("")
+  const [timeSlot, setTimeSlot]   = useState("")
 
-  const schedule = (() => {
-    const base = getBookings(selectedDate)
-    const extra = extraBookingsByDate[selectedDate] || 0
+  /* form fields */
+  const [form, setForm] = useState({ name:"", phone:"", email:"", message:"" })
 
-    return {
-      ...base,
-      totalBooked: base.totalBooked + extra,
-      available: Math.max(TOTAL_CAPACITY - (base.totalBooked + extra), 0)
-    }
-  })()
+  /* modal / result states */
+  const [fullAlert, setFullAlert]   = useState(null)   // { message }
+  const [submitMsg, setSubmitMsg]   = useState(null)   // { ok, text }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    if (name === "date") setSelectedDate(value)
-    setForm((p) => ({ ...p, [name]: value }))
-  }
+  const dayConfig      = getDayConfig(dateKey)
+  const dateBookingMap = getDateBookings(dateKey)
 
+  /* total booked count for the selected date */
+  const totalBooked = dayConfig.services.reduce((sum, s) => {
+    const slotMap = dateBookingMap[s.id] || {}
+    return sum + Object.values(slotMap).reduce((a, b) => a + b, 0)
+  }, 0)
+  const totalCap = dayConfig.services.reduce((a, s) => a + s.capacity, 0)
+
+  /* ── step 1 helpers ── */
   const handleDateClick = (key) => {
-    setSelectedDate(key)
-    setSubmitState({ type: "idle", message: "" })
-    setForm((p) => ({ ...p, date: key }))
+    const cfg = getDayConfig(key)
+    if (!cfg.isOpen) return          // don't allow clicking closed days
+    setDateKey(key)
+    setServiceId("")
+    setTimeSlot("")
+    setSubmitMsg(null)
   }
 
-  const submitForm = (e) => {
+  /* ── step 3 submit ── */
+  const handleSubmit = (e) => {
     e.preventDefault()
+    if (!timeSlot) return
 
-    const bookingPayload = {
-      date: form.date,
-      time: form.time,
-      service: form.service.trim().toLowerCase()
-    }
-
-    const isSlotTaken = confirmedBookings.some(
-      (booking) =>
-        booking.date === bookingPayload.date &&
-        booking.time === bookingPayload.time &&
-        booking.service === bookingPayload.service
-    )
-
-    if (isSlotTaken) {
-      setSubmitState({
-        type: "error",
-        message:
-          "This slot is already booked for the day. Choose a different time slot or book for another day."
-      })
-      return
-    }
-
-    setConfirmedBookings((prev) => [...prev, bookingPayload])
-    setSubmitState({
-      type: "success",
-      message: `Appointment slot reserved for ${readableDate(form.date)} at ${form.time}.`
+    const result = addBooking({
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      message: form.message,
+      date: dateKey,
+      serviceId,
+      time: timeSlot,
     })
+
+    if (result.ok) {
+      setSubmitMsg({ ok: true, text: `Confirmed! ${BASE_SERVICES.find(s=>s.id===serviceId)?.title} on ${readableDate(dateKey)} at ${timeSlot}. See you soon! 🎉` })
+      setStep(1)
+      setServiceId("")
+      setTimeSlot("")
+      setForm({ name:"", phone:"", email:"", message:"" })
+    } else {
+      if (result.isFull) {
+        setFullAlert({ message: result.reason })
+      } else {
+        setSubmitMsg({ ok: false, text: result.reason })
+      }
+    }
   }
 
   return (
-    <main className="page-content bg-white">
+    <main className="appt-page">
+      {/* ── Full-Capacity Alert Modal ── */}
+      {fullAlert && (
+        <div className="appt-modal-overlay" onClick={() => setFullAlert(null)}>
+          <div className="appt-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="appt-modal__icon">🚫</div>
+            <h3 className="appt-modal__title">Slot Fully Booked</h3>
+            <p className="appt-modal__body">{fullAlert.message}</p>
+            <button className="appt-modal__btn" onClick={() => setFullAlert(null)}>
+              Choose Another Slot
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* ===== Banner ===== */}
-      <section
-        className="dlab-bnr-inr overlay-primary"
-        style={{ backgroundImage: "url(/images/banner/about.jpg)" }}
-      >
-        <div className="container">
-          <h1 className="text-white">Book Appointment</h1>
+      {/* ── Hero Banner ── */}
+      <section className="appt-hero" style={{ backgroundImage: "url(/images/banner/about.jpg)" }}>
+        <div className="appt-hero__overlay" />
+        <div className="appt-hero__content">
+          <span className="appt-hero__eyebrow">Leela's Aesthetic Lounge</span>
+          <h1 className="appt-hero__title">Book an Appointment</h1>
+          <p className="appt-hero__sub">Secure your slot with ease. Walk-ins welcome, reservations preferred.</p>
+          <div className="appt-hero__badges">
+            <span className="appt-hero__badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              10:30 AM – 9:00 PM
+            </span>
+            <span className="appt-hero__badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Walk-ins Welcome
+            </span>
+            <span className="appt-hero__badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Easy Booking
+            </span>
+          </div>
         </div>
       </section>
 
-      {/* ===== Content ===== */}
-      <section className="content-inner-2">
-        <div className="container appointment-layout">
-
-          {/* ================= LEFT PANEL ================= */}
-          <div className="appointment-main-panel">
-
-            {/* Intro */}
-            <div className="appointment-intro-card">
-              <h2>Nail Appointment Planner</h2>
-              <p>Select a date and request your preferred slot.</p>
-              <div className="appointment-hours-pill">
-                <span>Shop Time</span>
-                <strong>10:30 AM – 9:00 PM</strong>
-              </div>
+      {/* ── Body ── */}
+      <section className="appt-body">
+        <div className="appt-container">
+          {/* Success banner (persists across step resets) */}
+          {submitMsg?.ok && (
+            <div className="appt-success-banner">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <p>{submitMsg.text}</p>
+              <button onClick={() => setSubmitMsg(null)}>✕</button>
             </div>
+          )}
 
-            {/* Service Timing */}
-            <div className="appointment-service-card">
-              <h3>Nail Service Duration</h3>
+          <div className="appt-grid">
+            {/* ══════════════ LEFT PANEL ══════════════ */}
+            <div className="appt-left">
 
-              {NAIL_SERVICES.map((s) => (
-                <div key={s.title} className="appointment-service-row">
-                  <div>
-                    <strong>{s.title}</strong>
-                    <span>{s.capacity} slots/day</span>
-                  </div>
-                  <p>{s.duration}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Booking Rules */}
-            <div className="appointment-policy-card">
-              <h3>Booking Rule</h3>
-              <p>{getLeadMessage(selectedDate)}</p>
-              <strong>{readableDate(selectedDate)}</strong>
-            </div>
-
-            {/* Form */}
-            <div className="appointment-form-card">
-              <h3>Request Appointment</h3>
-              <span>{schedule.totalBooked} booked</span>
-
-              <form onSubmit={submitForm} className="dlab-form">
-
-                <input name="name" required placeholder="Name" onChange={handleChange} className="form-control m-b20" />
-                <input name="phone" required placeholder="Mobile" onChange={handleChange} className="form-control m-b20" />
-
-                <select name="service" className="form-control m-b20" value={form.service} onChange={handleChange}>
-                  {services.map((s) => (
-                    <option key={s.slug} value={s.title}>{s.title}</option>
-                  ))}
-                </select>
-
-                <input type="date" name="date" value={form.date} onChange={handleChange} className="form-control m-b20" />
-                <input type="time" name="time" required onChange={handleChange} className="form-control m-b20" />
-
-                <input type="email" name="email" required placeholder="Email" onChange={handleChange} className="form-control m-b20" />
-
-                <textarea name="message" required placeholder="Message" onChange={handleChange} className="form-control m-b20" />
-
-                <button className="btn site-button btn-block">Submit</button>
-
-              </form>
-
-              {submitState.type !== "idle" && (
-                <p
-                  className={`appointment-submit-note ${
-                    submitState.type === "error" ? "is-error" : "is-success"
-                  }`}
-                >
-                  {submitState.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* ================= RIGHT PANEL ================= */}
-          <aside className="appointment-calendar-panel">
-
-            <div className="appointment-calendar-card">
-              <h3>
-                {today.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-              </h3>
-
-              <div className="appointment-weekdays">
-                {WEEK_DAYS.map((d) => (
-                  <span key={d}>{d}</span>
+              {/* Step Nav */}
+              <div className="appt-steps">
+                {[
+                  { n:1, label:"Pick a Date" },
+                  { n:2, label:"Choose Service" },
+                  { n:3, label:"Time & Details" },
+                ].map(({ n, label }) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={`appt-step-btn${step === n ? " is-active" : ""}${step > n ? " is-done" : ""}`}
+                    onClick={() => step > n && setStep(n)}
+                  >
+                    <span className="appt-step-num">
+                      {step > n
+                        ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        : n}
+                    </span>
+                    <span className="appt-step-label">{label}</span>
+                  </button>
                 ))}
               </div>
 
-              <div className="appointment-calendar-grid">
-                {calendar.map((date, i) => {
-                  if (!date) return <div key={i}></div>
+              {/* ══ STEP 1 — Pick a Date ══ */}
+              {step === 1 && (
+                <div className="appt-step-content">
+                  <div className="appt-card">
+                    <div className="appt-card__head">
+                      <div>
+                        <p className="appt-card__eyebrow">Step 1 of 3</p>
+                        <h2 className="appt-card__title">Select a Date</h2>
+                      </div>
+                      <div className="appt-month-badge">
+                        {today.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                      </div>
+                    </div>
 
-                  const key = getDateKey(date)
-                  const sum = getBookings(key)
-                  const totalForDay = sum.totalBooked + (extraBookingsByDate[key] || 0)
+                    <div className="appt-weekdays">
+                      {WEEK_DAYS.map((d) => <span key={d}>{d}</span>)}
+                    </div>
 
-                  return (
+                    <div className="appt-cal-grid">
+                      {calendar.map((date, i) => {
+                        if (!date) return <div key={i} className="appt-cal-empty" />
+                        const key = getDateKey(date)
+                        const cfg = getDayConfig(key)
+                        const bkMap = getDateBookings(key)
+                        const booked = cfg.services.reduce((sum, s) => {
+                          return sum + Object.values(bkMap[s.id] || {}).reduce((a,b)=>a+b, 0)
+                        }, 0)
+                        const cap = cfg.services.reduce((a,s)=>a+s.capacity, 0)
+                        const pct = cap > 0 ? Math.round((booked/cap)*100) : 0
+                        const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate())
+                        const isClosed = !cfg.isOpen
+                        const isSel = key === dateKey
+                        const isToday = key === todayKey
+
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            disabled={isPast || isClosed}
+                            className={`appt-day${isSel?" is-selected":""}${isToday?" is-today":""}${isPast?" is-past":""}${isClosed?" is-closed":""}`}
+                            onClick={() => handleDateClick(key)}
+                            title={isClosed ? "Shop closed this day" : undefined}
+                          >
+                            <span className="appt-day__num">{date.getDate()}</span>
+                            {isClosed
+                              ? <span className="appt-day__closed">Closed</span>
+                              : <>
+                                  <div className="appt-day__bar-wrap">
+                                    <div className="appt-day__bar" style={{ width:`${pct}%` }} />
+                                  </div>
+                                  <span className="appt-day__count">{booked} bkd</span>
+                                </>
+                            }
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    <div className="appt-cal-legend">
+                      <span><i className="appt-dot appt-dot--low" /> Open</span>
+                      <span><i className="appt-dot appt-dot--mid" /> Moderate</span>
+                      <span><i className="appt-dot appt-dot--high" /> Full</span>
+                      <span><i className="appt-dot appt-dot--closed" /> Closed</span>
+                    </div>
+
                     <button
-                      key={key}
-                      className={`appointment-day ${
-                        key === selectedDate ? "is-selected" : ""
-                      }`}
-                      onClick={() => handleDateClick(key)}
+                      className="appt-next-btn"
+                      type="button"
+                      onClick={() => setStep(2)}
                     >
-                      <span>{date.getDate()}</span>
-                      <small>{totalForDay} booked</small>
+                      Continue  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
-                  )
-                })}
-              </div>
+                  </div>
+
+                  {/* Day Summary Card */}
+                  <div className="appt-card">
+                    <p className="appt-card__eyebrow">Selected Day</p>
+                    <h2 className="appt-card__title" style={{marginBottom:"12px"}}>Day Overview</h2>
+                    <p className="appt-day-label">{readableDate(dateKey)}</p>
+                    <div className="appt-stats-row">
+                      <div className="appt-stat appt-stat--booked"><strong>{totalBooked}</strong><span>Booked</span></div>
+                      <div className="appt-stat appt-stat--cap"><strong>{totalCap}</strong><span>Capacity</span></div>
+                      <div className="appt-stat appt-stat--avail"><strong>{Math.max(totalCap-totalBooked,0)}</strong><span>Available</span></div>
+                    </div>
+                    <div className="appt-avail-bar-wrap">
+                      <div className="appt-avail-bar-track">
+                        <div className="appt-avail-bar-fill" style={{ width:`${totalCap>0?Math.round(((totalCap-totalBooked)/totalCap)*100):100}%` }} />
+                      </div>
+                      <span className="appt-avail-pct">
+                        {totalCap>0?Math.round(((totalCap-totalBooked)/totalCap)*100):100}% open
+                      </span>
+                    </div>
+                    <div className="appt-booking-rows">
+                      {dayConfig.services.filter(s=>{
+                        const slotMap = dateBookingMap[s.id]||{}
+                        return Object.values(slotMap).some(v=>v>0)
+                      }).length === 0
+                        ? <p className="appt-empty-note">No bookings yet for this day. 🎉</p>
+                        : dayConfig.services.map(s=>{
+                            const slotMap = dateBookingMap[s.id]||{}
+                            const booked = Object.values(slotMap).reduce((a,b)=>a+b,0)
+                            if (booked === 0) return null
+                            return (
+                              <div key={s.id} className="appt-brow">
+                                <div className="appt-brow__left">
+                                  <span className="appt-brow__icon">{s.icon}</span>
+                                  <strong className="appt-brow__name">{s.title}</strong>
+                                </div>
+                                <div className="appt-brow__right">
+                                  <div className="appt-brow__dots">
+                                    {Array.from({length:s.capacity}).map((_,idx)=>(
+                                      <span key={idx} className={`appt-brow__dot${idx<booked?" is-filled":""}`} />
+                                    ))}
+                                  </div>
+                                  <span className="appt-brow__frac">{booked}/{s.capacity}</span>
+                                </div>
+                              </div>
+                            )
+                          })
+                      }
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ══ STEP 2 — Choose Service ══ */}
+              {step === 2 && (
+                <div className="appt-step-content">
+                  <div className="appt-card">
+                    <div className="appt-card__head">
+                      <div>
+                        <p className="appt-card__eyebrow">Step 2 of 3 · {readableDate(dateKey)}</p>
+                        <h2 className="appt-card__title">Choose a Service</h2>
+                      </div>
+                      <div className="appt-hours-pill">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        10:30 AM – 9:00 PM
+                      </div>
+                    </div>
+
+                    <div className="appt-service-grid">
+                      {dayConfig.services.map((s) => {
+                        const bkMap = dateBookingMap[s.id] || {}
+                        const totalBooked = Object.values(bkMap).reduce((a,b)=>a+b,0)
+                        const isFull = totalBooked >= s.capacity
+                        const isSel = serviceId === s.id
+                        return (
+                          <div
+                            key={s.id}
+                            role="button"
+                            tabIndex={isFull ? -1 : 0}
+                            className={`appt-serv-card${isSel?" is-selected":""}${isFull?" is-full":""}`}
+                            onClick={() => !isFull && setServiceId(s.id)}
+                            onKeyDown={(e) => e.key==="Enter" && !isFull && setServiceId(s.id)}
+                          >
+                            <span className="appt-serv-card__icon">{s.icon}</span>
+                            <strong className="appt-serv-card__name">{s.title}</strong>
+                            <p className="appt-serv-card__dur">{s.duration}</p>
+                            <span className={`appt-serv-card__cap${isFull?" is-full":""}`}>
+                              {isFull ? "Day Full" : `${s.capacity - totalBooked} left`}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    <div className="appt-nav-row">
+                      <button className="appt-back-btn" type="button" onClick={() => setStep(1)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Back
+                      </button>
+                      <button
+                        className="appt-next-btn"
+                        type="button"
+                        disabled={!serviceId}
+                        onClick={() => serviceId && setStep(3)}
+                      >
+                        Continue
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ══ STEP 3 — Time & Details ══ */}
+              {step === 3 && (
+                <div className="appt-step-content">
+                  <div className="appt-card">
+                    <div className="appt-card__head">
+                      <div>
+                        <p className="appt-card__eyebrow">Step 3 of 3 · {BASE_SERVICES.find(s=>s.id===serviceId)?.title}</p>
+                        <h2 className="appt-card__title">Pick a Time & Confirm</h2>
+                      </div>
+                      <div className="appt-booking-summary-pill">{readableDate(dateKey)}</div>
+                    </div>
+
+                    {/* Time Slots */}
+                    <div className="appt-time-section">
+                      <p className="appt-section-label">Available Time Slots</p>
+                      {dayConfig.timeSlots.length === 0
+                        ? <p className="appt-empty-note">No time slots configured by admin for this day.</p>
+                        : (
+                          <div className="appt-time-grid">
+                            {dayConfig.timeSlots.map((slot) => {
+                              const remaining = getSlotRemaining(dateKey, serviceId, slot)
+                              const isTaken = remaining <= 0
+                              const isSel = timeSlot === slot
+                              return (
+                                <button
+                                  key={slot}
+                                  type="button"
+                                  disabled={isTaken}
+                                  title={isTaken ? "This slot is fully booked" : `${remaining} spot${remaining!==1?"s":""} left`}
+                                  className={`appt-time-slot${isSel?" is-selected":""}${isTaken?" is-taken":""}`}
+                                  onClick={() => !isTaken && setTimeSlot(slot)}
+                                >
+                                  {slot}
+                                  {!isTaken && <span className="appt-time-slot__rem">{remaining}</span>}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )
+                      }
+                    </div>
+
+                    {/* Customer Form */}
+                    <form onSubmit={handleSubmit} className="appt-form">
+                      <p className="appt-section-label" style={{marginTop:"8px"}}>Your Details</p>
+
+                      <div className="appt-form__row">
+                        <div className="appt-form__group">
+                          <label className="appt-form__label">Full Name *</label>
+                          <input
+                            required
+                            placeholder="Your name"
+                            value={form.name}
+                            onChange={e => setForm(p=>({...p, name:e.target.value}))}
+                            className="appt-form__input"
+                          />
+                        </div>
+                        <div className="appt-form__group">
+                          <label className="appt-form__label">Phone *</label>
+                          <input
+                            required
+                            placeholder="+91 XXXXX XXXXX"
+                            value={form.phone}
+                            onChange={e => setForm(p=>({...p, phone:e.target.value}))}
+                            className="appt-form__input"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="appt-form__group appt-form__group--full">
+                        <label className="appt-form__label">Email *</label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="you@example.com"
+                          value={form.email}
+                          onChange={e => setForm(p=>({...p, email:e.target.value}))}
+                          className="appt-form__input"
+                        />
+                      </div>
+
+                      <div className="appt-form__group appt-form__group--full">
+                        <label className="appt-form__label">Message / Special Requests</label>
+                        <textarea
+                          placeholder="Any preferences or notes?"
+                          value={form.message}
+                          onChange={e => setForm(p=>({...p, message:e.target.value}))}
+                          className="appt-form__input appt-form__textarea"
+                        />
+                      </div>
+
+                      {!submitMsg?.ok && submitMsg && (
+                        <div className="appt-submit-note appt-submit-note--error">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                          <p>{submitMsg.text}</p>
+                        </div>
+                      )}
+
+                      <div className="appt-nav-row">
+                        <button className="appt-back-btn" type="button" onClick={() => setStep(2)}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                          Back
+                        </button>
+                        <button
+                          className="appt-submit-btn"
+                          type="submit"
+                          disabled={!timeSlot}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                          Confirm Booking
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="appointment-count-card">
-              <h3>Day Summary</h3>
-
-              <div className="appointment-day-totals">
-                <div>
-                  <strong>{schedule.totalBooked}</strong>
-                  <span>Booked</span>
+            {/* ══════════════ RIGHT PANEL ══════════════ */}
+            <aside className="appt-right">
+              {/* Info Card */}
+              <div className="appt-card appt-info-card">
+                <span className="appt-info-header-tag">Nail Specialists</span>
+                <h3 className="appt-info-title">Leela's Aesthetic Lounge</h3>
+                <p className="appt-info-sub">Premium beauty services crafted with care and expertise.</p>
+                <div className="appt-info-hours">
+                  <div className="appt-info-hour-row">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Mon – Fri: 10:30 AM – 9:00 PM</span>
+                  </div>
+                  <div className="appt-info-hour-row">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Sat – Sun: 10:30 AM – 8:00 PM</span>
+                  </div>
                 </div>
-                <div>
-                  <strong>{TOTAL_CAPACITY}</strong>
-                  <span>Capacity</span>
-                </div>
-                <div>
-                  <strong>{schedule.available}</strong>
-                  <span>Available</span>
+                <div className="appt-info-tags">
+                  {["Walk-ins Welcome","Premium Products","Certified Artists","Hygienic"].map(t=>(
+                    <span key={t} className="appt-info-tag">{t}</span>
+                  ))}
                 </div>
               </div>
 
-              {schedule.bookings.map((b) => (
-                <div key={b.title} className="appointment-booking-row">
-                  <strong>{b.title}</strong>
-                  <span>
-                    {b.booked}/{b.capacity}
-                  </span>
+              {/* Services Ref */}
+              <div className="appt-card">
+                <p className="appt-card__eyebrow">Quick Reference</p>
+                <h3 className="appt-card__title" style={{marginBottom:"14px"}}>Services & Duration</h3>
+                <div className="appt-ref-list">
+                  {dayConfig.services.map((s) => (
+                    <div key={s.id} className="appt-ref-row">
+                      <div className="appt-ref-row__left">
+                        <span className="appt-ref-row__icon">{s.icon}</span>
+                        <div>
+                          <strong className="appt-ref-row__name">{s.title}</strong>
+                          <span className="appt-ref-row__cap">{s.capacity} slot{s.capacity!==1?"s":""}/day</span>
+                        </div>
+                      </div>
+                      <span className="appt-ref-row__dur">{s.duration}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
 
-          </aside>
+              {/* Policy Card */}
+              <div className="appt-card">
+                <p className="appt-card__eyebrow">Booking Policy</p>
+                <h3 className="appt-card__title">Good to Know</h3>
+                <ul className="appt-policy-list">
+                  {[
+                    "Multiple customers can share a slot up to service capacity.",
+                    "Weekend bookings need 1 day advance notice.",
+                    "Weekday slots open 30–60 min before.",
+                    "All artists are certified & trained.",
+                    "Tools sterilized before every session.",
+                    "Late arrivals may shorten your session.",
+                  ].map(rule => (
+                    <li key={rule}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      {rule}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
     </main>
