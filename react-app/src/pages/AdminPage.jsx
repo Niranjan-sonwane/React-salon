@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { useBooking, BASE_SERVICES } from "../context/BookingContext"
+import { useBooking } from "../context/BookingContext"
 import { useAuth } from "../context/AuthContext"
 
 /* ─── Helpers ─── */
@@ -43,16 +43,22 @@ export default function AdminPage() {
   const {
     shopConfig,
     bookings,
+    BASE_SERVICES,
     getDayConfig,
     getDateBookings,
     updateShopConfig,
     setDayConfig,
     resetDayConfig,
     cancelBooking,
+    loadAdminData,
   } = useBooking()
 
   const { logout } = useAuth()
   const navigate   = useNavigate()
+
+  useEffect(() => {
+    loadAdminData()
+  }, [loadAdminData])
 
   const today    = new Date()
   const todayKey = getDateKey(today)

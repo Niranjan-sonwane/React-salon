@@ -1,86 +1,42 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
+import { fetchApi } from "../api"
 
-/* ─────────────────────────────────────────────
-   DEFAULT NAIL SERVICES (admin can override capacity per day)
-───────────────────────────────────────────── */
-export const BASE_SERVICES = [
-  { id: "gel-polish",        title: "Gel Polish",          icon: "💅", duration: "30–45 min",               defaultCapacity: 3 },
-  { id: "gel-overlay",       title: "Gel Overlay",         icon: "✨", duration: "45–60 min",               defaultCapacity: 2 },
-  { id: "temp-extension",    title: "Temp Extension",      icon: "💎", duration: "1 hr 30 min",             defaultCapacity: 1 },
-  { id: "gel-extension",     title: "Gel Extension",       icon: "🌸", duration: "1 hr 30 min – 2 hr 30 min", defaultCapacity: 2 },
-  { id: "acrylic-extension", title: "Acrylic Extension",   icon: "🎀", duration: "1 hr 30 min – 2 hr 30 min", defaultCapacity: 2 },
-  { id: "refilling",         title: "Refilling",           icon: "🔄", duration: "1 hr 30 min",             defaultCapacity: 1 },
-  { id: "removal",           title: "Removal",             icon: "🗑️", duration: "30 min",                  defaultCapacity: 1 },
-  { id: "nail-art",          title: "Nail Art Per Tip",    icon: "🎨", duration: "10–12 min",               defaultCapacity: 4 },
-]
-
-/* ─────────────────────────────────────────────
-   DEFAULT OPEN DAYS (all days open to start)
-   shopConfig.openDays = Set of day indexes 0–6
-   shopConfig.defaultTimeSlots = string[] "HH:MM"
-   shopConfig.dayConfigs[YYYY-MM-DD] = {
-     open: bool,
-     timeSlots: string[],
-     services: { [serviceId]: capacity }
-   }
-───────────────────────────────────────────── */
-const DEFAULT_TIME_SLOTS = [
-  "10:30","11:00","11:30","12:00","12:30","13:00",
-  "13:30","14:00","14:30","15:00","15:30","16:00",
-  "16:30","17:00","17:30","18:00","18:30","19:00",
-  "19:30","20:00","20:30",
-]
-
-const DEFAULT_SHOP_CONFIG = {
-  openDays: [0,1,2,3,4,5,6],          // all 7 days open by default
-  defaultTimeSlots: DEFAULT_TIME_SLOTS,
-  dayConfigs: {},                       // per-date overrides: { [YYYY-MM-DD]: DayConfig }
-}
-
-/* ─────────────────────────────────────────────
-   CONTEXT
-───────────────────────────────────────────── */
 const BookingContext = createContext(null)
 
-function loadFromStorage(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
-
 export function BookingProvider({ children }) {
-  const [shopConfig, setShopConfig] = useState(() =>
-    loadFromStorage("leela_shop_config", DEFAULT_SHOP_CONFIG)
-  )
-  const [bookings, setBookings] = useState(() =>
-    loadFromStorage("leela_bookings", [])
-  )
+  const [shopConfig, setShopConfig] = useState({ openDays: [0,1,2,3,4,5,6], defaultTimeSlots: [], dayConfigs: {} })
+  const [bookings, setBookings] = useState([])
+  const [BASE_SERVICES, setBaseServices] = useState([])
 
-  // Persist to localStorage whenever state changes
+  // Fetch base services on mount (public)
   useEffect(() => {
-    localStorage.setItem("leela_shop_config", JSON.stringify(shopConfig))
-  }, [shopConfig])
+    fetchApi("/services").then(res => {
+      setBaseServices(res || [])
+    }).catch(console.error)
+  }, [])
 
-  useEffect(() => {
-    localStorage.setItem("leela_bookings", JSON.stringify(bookings))
-  }, [bookings])
+  /* ── Admin Data ── */
+  const loadAdminData = useCallback(async () => {
+    try {
+      const configRes = await fetchApi("/admin/config")
+      if (configRes) setShopConfig(configRes)
+      const bookRes = await fetchApi("/admin/bookings")
+      if (bookRes && bookRes.bookings) setBookings(bookRes.bookings)
+    } catch (err) {
+      console.error("Failed to load admin data", err)
+    }
+  }, [])
 
-  /* ── Helpers ── */
-
-  /** Returns the effective config for a given YYYY-MM-DD date key */
+  /* ── Synchronous Helpers (Primarily used by AdminPage) ── */
   const getDayConfig = useCallback((dateKey) => {
-    const [y,,d] = dateKey.split("-")
     const dayOfWeek = new Date(dateKey).getDay()
-    const override = shopConfig.dayConfigs[dateKey] || {}
+    const override = shopConfig.dayConfigs?.[dateKey] || {}
 
     const isOpen = override.open !== undefined
       ? override.open
-      : shopConfig.openDays.includes(dayOfWeek)
+      : (shopConfig.openDays || []).includes(dayOfWeek)
 
-    const timeSlots = override.timeSlots ?? shopConfig.defaultTimeSlots
+    const timeSlots = override.timeSlots ?? (shopConfig.defaultTimeSlots || [])
 
     const services = BASE_SERVICES.map((s) => ({
       ...s,
@@ -88,12 +44,8 @@ export function BookingProvider({ children }) {
     }))
 
     return { dateKey, isOpen, timeSlots, services }
-  }, [shopConfig])
+  }, [shopConfig, BASE_SERVICES])
 
-  /**
-   * Returns bookings aggregated for a specific date:
-   * { [serviceId]: { [time]: bookedCount } }
-   */
   const getDateBookings = useCallback((dateKey) => {
     const map = {}
     bookings
@@ -105,10 +57,6 @@ export function BookingProvider({ children }) {
     return map
   }, [bookings])
 
-  /**
-   * Returns remaining capacity for a specific service+time slot on a given date.
-   * capacity = dayConfig.capacity - bookings already made for that slot
-   */
   const getSlotRemaining = useCallback((dateKey, serviceId, time) => {
     const { services } = getDayConfig(dateKey)
     const svc = services.find((s) => s.id === serviceId)
@@ -118,71 +66,74 @@ export function BookingProvider({ children }) {
     return Math.max(svc.capacity - used, 0)
   }, [getDayConfig, getDateBookings])
 
-  /**
-   * Attempt to add a booking.
-   * Returns { ok: true } or { ok: false, reason: string }
-   */
-  const addBooking = useCallback((booking) => {
-    // booking shape: { id, name, phone, email, message, date, serviceId, time }
-    const { date, serviceId, time } = booking
-    const { isOpen, services, timeSlots } = getDayConfig(date)
-
-    if (!isOpen) {
-      return { ok: false, reason: "The shop is closed on this day." }
-    }
-    if (!timeSlots.includes(time)) {
-      return { ok: false, reason: "This time slot is not available on the selected day." }
-    }
-    const svc = services.find((s) => s.id === serviceId)
-    if (!svc) {
-      return { ok: false, reason: "Service not found." }
-    }
-
-    const remaining = getSlotRemaining(date, serviceId, time)
-    if (remaining <= 0) {
-      return {
-        ok: false,
-        reason: `No capacity left for "${svc.title}" at ${time} on this day. Please choose another slot or date.`,
-        isFull: true,
-      }
-    }
-
-    setBookings((prev) => [
-      ...prev,
-      { ...booking, id: `B-${Date.now()}-${Math.random().toString(36).slice(2,7)}`, createdAt: new Date().toISOString() },
-    ])
-    return { ok: true }
-  }, [getDayConfig, getSlotRemaining])
-
   /* ── Admin Actions ── */
+  const updateShopConfig = useCallback(async (updater) => {
+    const next = typeof updater === "function" ? updater(shopConfig) : { ...shopConfig, ...updater }
+    try {
+      await fetchApi("/admin/config", { 
+        method: "PUT", 
+        body: JSON.stringify({ openDays: next.openDays, defaultTimeSlots: next.defaultTimeSlots }) 
+      })
+      setShopConfig(next)
+    } catch (e) { console.error(e) }
+  }, [shopConfig])
 
-  const updateShopConfig = useCallback((updater) => {
-    setShopConfig((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : { ...prev, ...updater }
-      return next
-    })
+  const setDayConfig = useCallback(async (dateKey, config) => {
+    try {
+      await fetchApi(`/admin/config/day/${dateKey}`, { 
+        method: "PUT", 
+        body: JSON.stringify(config) 
+      })
+      setShopConfig((prev) => ({
+        ...prev,
+        dayConfigs: {
+          ...prev.dayConfigs,
+          [dateKey]: { ...(prev.dayConfigs[dateKey] || {}), ...config },
+        },
+      }))
+    } catch (e) { console.error(e) }
   }, [])
 
-  const setDayConfig = useCallback((dateKey, config) => {
-    setShopConfig((prev) => ({
-      ...prev,
-      dayConfigs: {
-        ...prev.dayConfigs,
-        [dateKey]: { ...(prev.dayConfigs[dateKey] || {}), ...config },
-      },
-    }))
+  const resetDayConfig = useCallback(async (dateKey) => {
+    try {
+      await fetchApi(`/admin/config/day/${dateKey}`, { method: "DELETE" })
+      setShopConfig((prev) => {
+        const next = { ...prev, dayConfigs: { ...prev.dayConfigs } }
+        delete next.dayConfigs[dateKey]
+        return next
+      })
+    } catch (e) { console.error(e) }
   }, [])
 
-  const resetDayConfig = useCallback((dateKey) => {
-    setShopConfig((prev) => {
-      const next = { ...prev, dayConfigs: { ...prev.dayConfigs } }
-      delete next.dayConfigs[dateKey]
-      return next
-    })
+  const cancelBooking = useCallback(async (bookingId) => {
+    try {
+      await fetchApi(`/admin/bookings/${bookingId}`, { method: "DELETE" })
+      setBookings((prev) => prev.filter((b) => b.id !== bookingId))
+    } catch (e) { console.error(e) }
   }, [])
 
-  const cancelBooking = useCallback((bookingId) => {
-    setBookings((prev) => prev.filter((b) => b.id !== bookingId))
+  /* ── Public Actions ── */
+  const addBooking = useCallback(async (booking) => {
+    try {
+      const res = await fetchApi("/bookings", {
+        method: "POST",
+        body: JSON.stringify(booking)
+      })
+      // Optionally update local bookings if admin is currently viewing
+      setBookings((prev) => [...prev, res.booking || res.data || res])
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, reason: err.message, isFull: err.code === "SLOT_FULL" || err.code === "INVALID_SLOT" }
+    }
+  }, [])
+
+  // Public fetching for Appointment Page
+  const getDayAvailability = useCallback(async (dateKey) => {
+    try {
+      return await fetchApi(`/availability?date=${dateKey}`)
+    } catch(e) {
+      return null
+    }
   }, [])
 
   return (
@@ -190,6 +141,7 @@ export function BookingProvider({ children }) {
       shopConfig,
       bookings,
       BASE_SERVICES,
+      loadAdminData,
       getDayConfig,
       getDateBookings,
       getSlotRemaining,
@@ -198,6 +150,7 @@ export function BookingProvider({ children }) {
       setDayConfig,
       resetDayConfig,
       cancelBooking,
+      getDayAvailability
     }}>
       {children}
     </BookingContext.Provider>

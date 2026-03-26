@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { services as ALL_SERVICES } from "../data/services"
+import { useState, useEffect } from "react"
 import { useBooking } from "../context/BookingContext"
+import { fetchApi } from "../api"
 
 /* ─────────────── helpers ─────────────── */
 const pad = (v) => String(v).padStart(2, "0")
@@ -37,10 +37,9 @@ export default function AppointmentPage() {
 
   const {
     getDayConfig,
-    getDateBookings,
-    getSlotRemaining,
     addBooking,
     BASE_SERVICES,
+    getDayAvailability
   } = useBooking()
 
   /* wizard step */
@@ -57,16 +56,33 @@ export default function AppointmentPage() {
   /* modal / result states */
   const [fullAlert, setFullAlert]   = useState(null)   // { message }
   const [submitMsg, setSubmitMsg]   = useState(null)   // { ok, text }
+  const [isLoadingAvail, setIsLoadingAvail] = useState(false)
 
-  const dayConfig      = getDayConfig(dateKey)
-  const dateBookingMap = getDateBookings(dateKey)
+  /* Fetched API states */
+  const [dayAvail, setDayAvail] = useState(null)
+  const [slotAvail, setSlotAvail] = useState([])
+
+  useEffect(() => {
+    setIsLoadingAvail(true)
+    getDayAvailability(dateKey)
+      .then(res => {
+        setDayAvail(res)
+        setIsLoadingAvail(false)
+      })
+      .catch(() => setIsLoadingAvail(false))
+  }, [dateKey, getDayAvailability])
+
+  useEffect(() => {
+    if (serviceId && dateKey) {
+      fetchApi(`/slots?date=${dateKey}&serviceId=${serviceId}`)
+        .then(res => setSlotAvail(res?.slots || []))
+        .catch(console.error)
+    }
+  }, [serviceId, dateKey])
 
   /* total booked count for the selected date */
-  const totalBooked = dayConfig.services.reduce((sum, s) => {
-    const slotMap = dateBookingMap[s.id] || {}
-    return sum + Object.values(slotMap).reduce((a, b) => a + b, 0)
-  }, 0)
-  const totalCap = dayConfig.services.reduce((a, s) => a + s.capacity, 0)
+  const totalBooked = dayAvail ? dayAvail.services.reduce((a, s) => a + s.totalBooked, 0) : 0
+  const totalCap = dayAvail ? dayAvail.services.reduce((a, s) => a + s.capacity, 0) : 0
 
   /* ── step 1 helpers ── */
   const handleDateClick = (key) => {
@@ -79,11 +95,11 @@ export default function AppointmentPage() {
   }
 
   /* ── step 3 submit ── */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!timeSlot) return
 
-    const result = addBooking({
+    const result = await addBooking({
       name: form.name,
       phone: form.phone,
       email: form.email,
@@ -94,11 +110,14 @@ export default function AppointmentPage() {
     })
 
     if (result.ok) {
-      setSubmitMsg({ ok: true, text: `Confirmed! ${BASE_SERVICES.find(s=>s.id===serviceId)?.title} on ${readableDate(dateKey)} at ${timeSlot}. See you soon! 🎉` })
+      const svcTitle = BASE_SERVICES.find(s=>s.id===serviceId)?.title || "Service"
+      setSubmitMsg({ ok: true, text: `Confirmed! ${svcTitle} on ${readableDate(dateKey)} at ${timeSlot}. See you soon! 🎉` })
       setStep(1)
       setServiceId("")
       setTimeSlot("")
       setForm({ name:"", phone:"", email:"", message:"" })
+      // Refresh availability
+      getDayAvailability(dateKey).then(res => setDayAvail(res))
     } else {
       if (result.isFull) {
         setFullAlert({ message: result.reason })
@@ -210,12 +229,7 @@ export default function AppointmentPage() {
                         if (!date) return <div key={i} className="appt-cal-empty" />
                         const key = getDateKey(date)
                         const cfg = getDayConfig(key)
-                        const bkMap = getDateBookings(key)
-                        const booked = cfg.services.reduce((sum, s) => {
-                          return sum + Object.values(bkMap[s.id] || {}).reduce((a,b)=>a+b, 0)
-                        }, 0)
-                        const cap = cfg.services.reduce((a,s)=>a+s.capacity, 0)
-                        const pct = cap > 0 ? Math.round((booked/cap)*100) : 0
+                        // Removed the bkMap dot logic as we don't fetch full month data
                         const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate())
                         const isClosed = !cfg.isOpen
                         const isSel = key === dateKey
@@ -233,12 +247,7 @@ export default function AppointmentPage() {
                             <span className="appt-day__num">{date.getDate()}</span>
                             {isClosed
                               ? <span className="appt-day__closed">Closed</span>
-                              : <>
-                                  <div className="appt-day__bar-wrap">
-                                    <div className="appt-day__bar" style={{ width:`${pct}%` }} />
-                                  </div>
-                                  <span className="appt-day__count">{booked} bkd</span>
-                                </>
+                              : <span className="appt-day__count">Open</span>
                             }
                           </button>
                         )
@@ -247,8 +256,6 @@ export default function AppointmentPage() {
 
                     <div className="appt-cal-legend">
                       <span><i className="appt-dot appt-dot--low" /> Open</span>
-                      <span><i className="appt-dot appt-dot--mid" /> Moderate</span>
-                      <span><i className="appt-dot appt-dot--high" /> Full</span>
                       <span><i className="appt-dot appt-dot--closed" /> Closed</span>
                     </div>
 
@@ -256,8 +263,9 @@ export default function AppointmentPage() {
                       className="appt-next-btn"
                       type="button"
                       onClick={() => setStep(2)}
+                      disabled={isLoadingAvail || !dayAvail || !dayAvail.isOpen}
                     >
-                      Continue  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                      {isLoadingAvail ? "Loading..." : "Continue"}  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
                   </div>
 
@@ -280,32 +288,24 @@ export default function AppointmentPage() {
                       </span>
                     </div>
                     <div className="appt-booking-rows">
-                      {dayConfig.services.filter(s=>{
-                        const slotMap = dateBookingMap[s.id]||{}
-                        return Object.values(slotMap).some(v=>v>0)
-                      }).length === 0
+                      {!dayAvail || dayAvail.services.filter(s => s.totalBooked > 0).length === 0
                         ? <p className="appt-empty-note">No bookings yet for this day. 🎉</p>
-                        : dayConfig.services.map(s=>{
-                            const slotMap = dateBookingMap[s.id]||{}
-                            const booked = Object.values(slotMap).reduce((a,b)=>a+b,0)
-                            if (booked === 0) return null
-                            return (
-                              <div key={s.id} className="appt-brow">
-                                <div className="appt-brow__left">
-                                  <span className="appt-brow__icon">{s.icon}</span>
-                                  <strong className="appt-brow__name">{s.title}</strong>
-                                </div>
-                                <div className="appt-brow__right">
-                                  <div className="appt-brow__dots">
-                                    {Array.from({length:s.capacity}).map((_,idx)=>(
-                                      <span key={idx} className={`appt-brow__dot${idx<booked?" is-filled":""}`} />
-                                    ))}
-                                  </div>
-                                  <span className="appt-brow__frac">{booked}/{s.capacity}</span>
-                                </div>
+                        : dayAvail.services.filter(s => s.totalBooked > 0).map(s => (
+                            <div key={s.id} className="appt-brow">
+                              <div className="appt-brow__left">
+                                <span className="appt-brow__icon">{s.icon}</span>
+                                <strong className="appt-brow__name">{s.title}</strong>
                               </div>
-                            )
-                          })
+                              <div className="appt-brow__right">
+                                <div className="appt-brow__dots">
+                                  {Array.from({length:Math.max(s.capacity, 1)}).map((_,idx)=>(
+                                    <span key={idx} className={`appt-brow__dot${idx<s.totalBooked?" is-filled":""}`} />
+                                  ))}
+                                </div>
+                                <span className="appt-brow__frac">{s.totalBooked}/{s.capacity}</span>
+                              </div>
+                            </div>
+                          ))
                       }
                     </div>
                   </div>
@@ -327,31 +327,33 @@ export default function AppointmentPage() {
                       </div>
                     </div>
 
-                    <div className="appt-service-grid">
-                      {dayConfig.services.map((s) => {
-                        const bkMap = dateBookingMap[s.id] || {}
-                        const totalBooked = Object.values(bkMap).reduce((a,b)=>a+b,0)
-                        const isFull = totalBooked >= s.capacity
-                        const isSel = serviceId === s.id
-                        return (
-                          <div
-                            key={s.id}
-                            role="button"
-                            tabIndex={isFull ? -1 : 0}
-                            className={`appt-serv-card${isSel?" is-selected":""}${isFull?" is-full":""}`}
-                            onClick={() => !isFull && setServiceId(s.id)}
-                            onKeyDown={(e) => e.key==="Enter" && !isFull && setServiceId(s.id)}
-                          >
-                            <span className="appt-serv-card__icon">{s.icon}</span>
-                            <strong className="appt-serv-card__name">{s.title}</strong>
-                            <p className="appt-serv-card__dur">{s.duration}</p>
-                            <span className={`appt-serv-card__cap${isFull?" is-full":""}`}>
-                              {isFull ? "Day Full" : `${s.capacity - totalBooked} left`}
-                            </span>
-                          </div>
-                        )
-                      })}
-                    </div>
+                    {!dayAvail ? (
+                      <p className="appt-empty-note">Loading capacity information...</p>
+                    ) : (
+                      <div className="appt-service-grid">
+                        {dayAvail.services.map((s) => {
+                          const isFull = s.remaining <= 0
+                          const isSel = serviceId === s.id
+                          return (
+                            <div
+                              key={s.id}
+                              role="button"
+                              tabIndex={isFull ? -1 : 0}
+                              className={`appt-serv-card${isSel?" is-selected":""}${isFull?" is-full":""}`}
+                              onClick={() => !isFull && setServiceId(s.id)}
+                              onKeyDown={(e) => e.key==="Enter" && !isFull && setServiceId(s.id)}
+                            >
+                              <span className="appt-serv-card__icon">{s.icon}</span>
+                              <strong className="appt-serv-card__name">{s.title}</strong>
+                              <p className="appt-serv-card__dur">{s.duration}</p>
+                              <span className={`appt-serv-card__cap${isFull?" is-full":""}`}>
+                                {isFull ? "Day Full" : `${s.remaining} left`}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
 
                     <div className="appt-nav-row">
                       <button className="appt-back-btn" type="button" onClick={() => setStep(1)}>
@@ -387,12 +389,13 @@ export default function AppointmentPage() {
                     {/* Time Slots */}
                     <div className="appt-time-section">
                       <p className="appt-section-label">Available Time Slots</p>
-                      {dayConfig.timeSlots.length === 0
+                      {!dayAvail || dayAvail.timeSlots.length === 0
                         ? <p className="appt-empty-note">No time slots configured by admin for this day.</p>
                         : (
                           <div className="appt-time-grid">
-                            {dayConfig.timeSlots.map((slot) => {
-                              const remaining = getSlotRemaining(dateKey, serviceId, slot)
+                            {dayAvail.timeSlots.map((slot) => {
+                              const slotData = slotAvail.find(sa => sa.time === slot)
+                              const remaining = slotData ? slotData.remaining : 0
                               const isTaken = remaining <= 0
                               const isSel = timeSlot === slot
                               return (
@@ -433,7 +436,7 @@ export default function AppointmentPage() {
                           <label className="appt-form__label">Phone *</label>
                           <input
                             required
-                            placeholder="+91 XXXXX XXXXX"
+                            placeholder="Your phone number"
                             value={form.phone}
                             onChange={e => setForm(p=>({...p, phone:e.target.value}))}
                             className="appt-form__input"
@@ -519,13 +522,13 @@ export default function AppointmentPage() {
                 <p className="appt-card__eyebrow">Quick Reference</p>
                 <h3 className="appt-card__title" style={{marginBottom:"14px"}}>Services & Duration</h3>
                 <div className="appt-ref-list">
-                  {dayConfig.services.map((s) => (
+                  {(dayAvail ? dayAvail.services : BASE_SERVICES).map((s) => (
                     <div key={s.id} className="appt-ref-row">
                       <div className="appt-ref-row__left">
                         <span className="appt-ref-row__icon">{s.icon}</span>
                         <div>
                           <strong className="appt-ref-row__name">{s.title}</strong>
-                          <span className="appt-ref-row__cap">{s.capacity} slot{s.capacity!==1?"s":""}/day</span>
+                          <span className="appt-ref-row__cap">{s.capacity || s.defaultCapacity} slot{(s.capacity || s.defaultCapacity)!==1?"s":""}/day</span>
                         </div>
                       </div>
                       <span className="appt-ref-row__dur">{s.duration}</span>

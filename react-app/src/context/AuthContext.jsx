@@ -1,13 +1,5 @@
-import { createContext, useContext, useState, useCallback } from "react"
-
-/* ─────────────────────────────────────────────
-   HARDCODED ADMIN CREDENTIALS
-   (Replace with real API call when backend is ready)
-───────────────────────────────────────────── */
-const ADMIN_CREDENTIALS = {
-  email: "admin@leelaslounge.com",
-  password: "Admin@2026",
-}
+import { createContext, useContext, useState, useCallback, useEffect } from "react"
+import { fetchApi } from "../api"
 
 /* ─────────────────────────────────────────────
    VALIDATION HELPERS
@@ -34,16 +26,25 @@ export function validatePassword(password) {
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  // Persists across page reloads within the same tab session
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem("leela_admin_auth") === "true"
+    return !!localStorage.getItem("leela_admin_token")
   })
+
+  // Optional: check session on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchApi("/auth/session")
+        .catch(() => {
+          setIsAuthenticated(false)
+        })
+    }
+  }, [isAuthenticated])
 
   /**
    * Attempt to login with provided credentials.
    * Returns { ok: true } or { ok: false, error: string }
    */
-  const login = useCallback((email, password) => {
+  const login = useCallback(async (email, password) => {
     // Format validation
     const emailErr = validateEmail(email)
     if (emailErr) return { ok: false, error: emailErr, field: "email" }
@@ -51,27 +52,45 @@ export function AuthProvider({ children }) {
     const passErr = validatePassword(password)
     if (passErr) return { ok: false, error: passErr, field: "password" }
 
-    // Credential check
-    if (
-      email.trim().toLowerCase() !== ADMIN_CREDENTIALS.email.toLowerCase() ||
-      password !== ADMIN_CREDENTIALS.password
-    ) {
+    try {
+      const response = await fetchApi("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      })
+
+      if (response && response.ok) {
+        localStorage.setItem("leela_admin_token", response.token)
+        setIsAuthenticated(true)
+        return { ok: true }
+      } else {
+        return {
+          ok: false,
+          error: "Invalid email or password.",
+          field: "general",
+        }
+      }
+    } catch (err) {
       return {
         ok: false,
-        error: "Invalid email or password. Please try again.",
-        field: "general",
+        error: err.message || "Failed to login. Please check connection.",
+        field: err.field || "general",
       }
     }
-
-    sessionStorage.setItem("leela_admin_auth", "true")
-    setIsAuthenticated(true)
-    return { ok: true }
   }, [])
 
-  const logout = useCallback(() => {
-    sessionStorage.removeItem("leela_admin_auth")
-    setIsAuthenticated(false)
-  }, [])
+  const logout = useCallback(async () => {
+    try {
+      if (isAuthenticated) {
+        await fetchApi("/auth/logout", { method: "POST" })
+      }
+    } catch (err) {
+      console.warn("Logout request failed", err)
+    } finally {
+      localStorage.removeItem("leela_admin_token")
+      sessionStorage.removeItem("leela_admin_auth")
+      setIsAuthenticated(false)
+    }
+  }, [isAuthenticated])
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
