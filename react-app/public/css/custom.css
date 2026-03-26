@@ -256,7 +256,7 @@
     color: #6a4031;
     padding: 7px 20px;
     position: relative;
-    width: 435px;
+    width: clamp(200px, 90vw, 435px);
     z-index: 4;
 }.call-to-action-section .email-container .email-box .submit-btn {
     position: absolute;
@@ -697,3 +697,258 @@
             width: 100%;
         }
     }
+
+/* =========================================================
+   RESPONSIVE — COMPLETE MOBILE OPTIMIZATIONS
+   ========================================================= */
+
+@media only screen and (max-width: 768px) {
+    /* Newsletter / Call-to-action section */
+    .call-to-action-section .contact {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .call-to-action-section .contact .media .media-body {
+        padding-right: 0;
+        text-align: center;
+    }
+
+    .call-to-action-section .contact .newsletter {
+        border-left: none;
+        border-top: 2px solid #a58e77;
+        padding-left: 0;
+        padding-top: 30px;
+        width: 100%;
+    }
+
+    .call-to-action-section .email-container .email-box {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .call-to-action-section .email-container .email-box .email {
+        width: 100%;
+        border-radius: 25px 25px 0 0;
+        padding: 10px 16px;
+    }
+
+    .call-to-action-section .email-container .email-box .submit-btn {
+        width: 100%;
+        border-radius: 0 0 25px 25px;
+        padding: 10px 16px;
+    }
+
+    /* About section responsiveness */
+    .about-hair-beauty::before {
+        width: 100%;
+        height: 50%;
+        bottom: 0;
+        top: auto;
+    }
+
+    .about-hair-content {
+        padding-left: 0;
+        padding-bottom: 30px;
+    }
+
+    .section-head h2 {
+        font-size: 32px;
+        line-height: 42px;
+    }
+
+    /* Service section parallax fix */
+    .service-section {
+        background-attachment: scroll;
+    }
+
+    .paralax {
+        background-attachment: scroll;
+        padding: 80px 0;
+    }
+
+    /* Header responsiveness */
+    .mo-left .header-nav.show {
+        width: 280px;
+    }
+
+    .site-header.center ul li a {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+
+    /* Container adjustments */
+    .container {
+        max-width: 100%;
+        padding: 0 5%;
+    }
+
+    /* Service box spacing */
+    .service-box {
+        padding: 15px;
+    }
+
+    /* Image comparison slider */
+    .service-section .image-container .ba-slider .after-lable {
+        right: -15px;
+        padding: 2px 5px;
+        font-size: 10px;
+    }
+
+    .service-section .image-container .ba-slider .before-lable {
+        left: -15px;
+        padding: 2px 5px;
+        font-size: 10px;
+    }
+
+    /* Portfolio grid */
+    .col-lg-3 {
+        min-width: calc(50% - 10px);
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    /* Text sizing for very small screens */
+    .section-head h2 {
+        font-size: 26px;
+        line-height: 34px;
+    }
+
+    .section-head h6 {
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .paralax h6 {
+        font-size: 24px;
+        line-height: 34px;
+    }
+
+    .we-process h2 {
+        font-size: 26px;
+        line-height: 36px;
+    }
+
+    /* Newsletter */
+    .call-to-action-section .contact .media .media-body h6 {
+        font-size: calc(12px + (18 - 12) * ((100vw - 320px) / (480 - 320)));
+    }
+
+    .call-to-action-section .contact .media .media-body p {
+        font-size: 12px;
+    }
+
+    /* Button sizing */
+    .site-button {
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* Header menu */
+    .mo-left .header-nav.show {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .site-header.center ul li.menu-btn a {
+        padding: 10px 16px;
+        width: 90%;
+        font-size: 12px;
+    }
+
+    /* Footer responsiveness */
+    .footer-top {
+        padding: 30px 0 0;
+    }
+
+    .footer-white .footer-top .widget h6 {
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .widget ul.foot-cont li a {
+        font-size: 13px;
+        line-height: 22px;
+    }
+
+    /* Service cards */
+    .service-content h6 a {
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .service-content p {
+        font-size: 14px;
+        line-height: 22px;
+    }
+
+    /* Portfolio image grid */
+    .col-lg-3, .col-md-4, .col-sm-6 {
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+
+    /* Image comparison slider cleanup */
+    .service-section .image-container .ba-slider .after-lable,
+    .service-section .image-container .ba-slider .before-lable {
+        display: none;
+    }
+
+    /* Parallax text */
+    .paralax {
+        padding: 60px 20px;
+    }
+
+    /* Container padding */
+    .container {
+        padding: 0 16px;
+    }
+
+    .container-largee {
+        padding: 0 16px;
+    }
+
+    /* Appointment form adjustments */
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-control {
+        padding: 11px 12px;
+        font-size: 14px;
+    }
+}
+
+@media only screen and (max-width: 360px) {
+    /* Text sizing for ultra-small screens */
+    .section-head h2 {
+        font-size: 22px;
+        line-height: 30px;
+    }
+
+    .paralax h6 {
+        font-size: 20px;
+        line-height: 28px;
+    }
+
+    /* Hide some elements on ultra-small screens */
+    .call-to-action-section .contact .media svg {
+        max-width: 18px;
+        margin-right: 8px;
+    }
+
+    .owl-theme .owl-dots {
+        display: none;
+    }
+
+    /* Reduce service box padding */
+    .service-box {
+        padding: 12px;
+    }
+
+    /* Portfolio single column */
+    .col-lg-3, .col-md-4, .col-sm-6 {
+        width: 100% !important;
+    }
+}

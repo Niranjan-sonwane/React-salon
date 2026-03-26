@@ -1,15 +1,15 @@
-export const services = [
+﻿export const services = [
   {
     slug: 'nails',
     aliases: [],
     title: 'Nails',
     shortDescription:
-      'Leela\'s Aesthetic Lounge offers luxurious nail services that blend quality and style.',
+      'Dazzler Beauty offers luxurious nail services that blend quality and style.',
     image: '/images/services/nails.jpg',
     bannerImage: '/images/banner/nails.jpg',
     detailImage: '/images/serv-banner/nails.jpg',
     descriptions: [
-      'Leela\'s Aesthetic Lounge offers luxurious nail services that blend quality, style, and hygiene for a polished result every time.',
+      'Dazzler Beauty offers luxurious nail services that blend quality, style, and hygiene for a polished result every time.',
       'From classic grooming to gel and creative finishes, each session is tailored to your preferences by experienced technicians.',
     ],
   },
@@ -112,3 +112,4 @@ export const services = [
     ],
   },
 ]
+

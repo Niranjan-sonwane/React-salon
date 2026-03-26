@@ -1623,10 +1623,53 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* ── Time slot toggles ── */
+.admin-time-builder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.admin-time-input {
+  height: 36px;
+  border: 1.5px solid rgba(138,74,47,0.22);
+  border-radius: 10px;
+  padding: 0 10px;
+  background: #fff;
+  color: #5b3c2a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-time-add {
+  height: 36px;
+  border: 1.5px solid var(--c-brand);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--c-brand-pale);
+  color: var(--c-brand-dark);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.admin-time-add:hover {
+  background: var(--c-brand);
+  color: #fff;
+}
+
 .admin-time-toggles {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.admin-time-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .admin-time-toggle {
@@ -1650,6 +1693,26 @@ input, select, textarea { font-family: inherit; }
 .admin-time-toggle:hover:not(.is-on) {
   border-color: var(--c-brand-light);
   color: var(--c-brand);
+}
+
+.admin-time-remove {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(138,74,47,0.2);
+  background: #fff;
+  color: #8b6d5a;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.admin-time-remove:hover {
+  color: #fff;
+  background: #b24d3f;
+  border-color: #b24d3f;
 }
 
 /* ── Calendar (admin) ── */
@@ -2538,4 +2601,746 @@ input, select, textarea { font-family: inherit; }
   .auth-submit-btn { font-size: 14px; padding: 13px 20px; }
   .auth-hint       { font-size: 9px; }
   .auth-demo-hint  { font-size: 11px; }
+}
+
+/* =========================================================
+   NAVBAR — RESPONSIVE HEADER
+   ========================================================= */
+@media (max-width: 768px) {
+  .site-header { padding: 0; }
+  
+  .navbar-toggler {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .navbar-toggler span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--c-text-head);
+    margin: 6px 0;
+    transition: 0.3s;
+  }
+
+  .navbar-toggler.collapsed span:nth-child(1) { transform: rotate(-45deg) translate(-8px, 8px); }
+  .navbar-toggler.collapsed span:nth-child(2) { opacity: 0; }
+  .navbar-toggler.collapsed span:nth-child(3) { transform: rotate(45deg) translate(-8px, -8px); }
+
+  .header-nav {
+    background: var(--c-surface);
+    border-top: 1px solid var(--c-border);
+    box-shadow: var(--shadow-md);
+    border-radius: 0;
+    max-width: 100% !important;
+  }
+
+  .header-nav.collapse:not(.show) {
+    display: none;
+  }
+
+  .header-nav.show {
+    display: block;
+    width: 100%;
+  }
+
+  .header-nav ul.nav {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .header-nav ul.nav li a {
+    padding: 14px 16px;
+    display: block;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .header-nav ul.nav li a:hover {
+    background: var(--c-brand-pale);
+  }
+
+  .header-nav ul.nav li.active a {
+    background: var(--c-brand-pale);
+    color: var(--c-brand-dark);
+  }
+
+  .header-nav ul.nav li.menu-item-has-children a .fa-chevron-down {
+    float: right;
+    transition: transform 0.3s;
+  }
+
+  .header-nav ul.nav li.menu-item-has-children .sub-menu {
+    position: static;
+    background: var(--c-brand-ultra);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .header-nav ul.nav li.menu-item-has-children .sub-menu li a {
+    padding-left: 32px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(138, 74, 47, 0.1);
+  }
+
+  .header-nav ul.nav li.menu-item-has-children:hover .sub-menu,
+  .header-nav ul.nav li.menu-item-has-children.show .sub-menu {
+    max-height: 500px;
+  }
+
+  .header-nav ul.nav li.menu-item-has-children:hover a .fa-chevron-down,
+  .header-nav ul.nav li.menu-item-has-children.show a .fa-chevron-down {
+    transform: rotate(180deg);
+  }
+
+  .header-nav ul.nav li.menu-btn {
+    margin: 0;
+    padding: 8px 16px;
+  }
+
+  .header-nav ul.nav li.menu-btn a {
+    background: var(--c-brand);
+    color: #fff !important;
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    border: none;
+    text-align: center;
+  }
+
+  .header-nav ul.nav li.menu-btn a:hover {
+    background: var(--c-brand-dark);
+  }
+
+  .admin-nav-icon {
+    position: fixed;
+    right: 16px;
+    top: 14px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+  }
+
+  .main-bar .container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  .logo-header {
+    flex: 1;
+  }
+
+  .logo-header img {
+    max-height: 40px;
+    width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-toggler {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar-toggler span {
+    width: 20px;
+    margin: 5px 0;
+  }
+
+  .header-nav ul.nav li a {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .header-nav ul.nav li.menu-item-has-children .sub-menu li a {
+    padding-left: 28px;
+    font-size: 12px;
+  }
+
+  .logo-header img {
+    max-height: 36px;
+  }
+
+  .admin-nav-icon {
+    width: 36px;
+    height: 36px;
+    right: 12px;
+    top: 12px;
+  }
+}
+
+/* =========================================================
+   FOOTER — RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 40px 0 20px;
+  }
+
+  .footer-top {
+    padding: 30px 0 0;
+  }
+
+  .footer-white .footer-top .widget h6 {
+    font-size: 16px;
+    line-height: 24px;
+    margin-bottom: 12px;
+  }
+
+  .widget {
+    margin-bottom: 24px;
+  }
+
+  .widget.one { display: none; }
+
+  .widget ul.foot-cont li a {
+    font-size: 13px;
+    line-height: 24px;
+  }
+
+  .widget_services h5.number a {
+    font-size: 18px;
+  }
+
+  .footer-bottom {
+    padding: 20px 0;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-top {
+    padding: 24px 0 0;
+  }
+
+  .footer-white .footer-top .widget h6 {
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: 10px;
+  }
+
+  .widget {
+    margin-bottom: 18px;
+  }
+
+  .widget ul.foot-cont li a {
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  .widget_services h5.number a {
+    font-size: 16px;
+  }
+
+  .widget-link ul {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .widget-link ul li a {
+    font-size: 11px;
+  }
+
+  .footer-bottom {
+    padding: 16px 0;
+    font-size: 11px;
+  }
+
+  .row .text-md-left,
+  .row .text-md-right {
+    text-align: center !important;
+  }
+}
+
+/* =========================================================
+   GENERAL RESPONSIVE UTILITIES
+   ========================================================= */
+@media (max-width: 768px) {
+  .container {
+    padding-left: clamp(12px, 3vw, 20px);
+    padding-right: clamp(12px, 3vw, 20px);
+  }
+
+  .row {
+    margin-left: clamp(-8px, -1.5vw, -15px);
+    margin-right: clamp(-8px, -1.5vw, -15px);
+  }
+
+  .col-lg-6,
+  .col-lg-4,
+  .col-lg-3,
+  .col-md-6,
+  .col-md-12 {
+    padding-left: clamp(8px, 1.5vw, 15px);
+    padding-right: clamp(8px, 1.5vw, 15px);
+  }
+
+  /* Common spacing adjustments */
+  h1 { font-size: clamp(22px, 4vw, 32px); line-height: 1.2; }
+  h2 { font-size: clamp(20px, 3.5vw, 28px); line-height: 1.3; }
+  h3 { font-size: clamp(18px, 3vw, 24px); line-height: 1.3; }
+  h4 { font-size: clamp(16px, 2.5vw, 20px); line-height: 1.4; }
+  h5 { font-size: clamp(14px, 2vw, 18px); line-height: 1.4; }
+  h6 { font-size: clamp(12px, 1.8vw, 16px); line-height: 1.4; }
+
+  p { font-size: clamp(13px, 1.5vw, 15px); line-height: 1.6; }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .row {
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+
+  .col-lg-6,
+  .col-lg-4,
+  .col-lg-3,
+  .col-md-6,
+  .col-md-12 {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .col-md-6 { width: 100% !important; }
+  .col-md-4 { width: 100% !important; }
+
+  /* Images responsive */
+  img { height: auto; max-width: 100%; }
+
+  /* Form controls */
+  .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  textarea.form-control {
+    min-height: 100px;
+  }
+
+  /* Button sizing */
+  .site-button {
+    padding: 11px 18px !important;
+    font-size: 13px !important;
+    min-width: 100px;
+  }
+
+  /* Tables - horizontal scroll on mobile */
+  table {
+    font-size: 12px;
+  }
+
+  table th,
+  table td {
+    padding: 10px 8px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY — TEXT SIZING FOR ALL DEVICES
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ensure text is readable on all devices */
+@media (max-width: 1024px) {
+  :root {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — ENHANCED MOBILE (≤ 600px)
+   ========================================================= */
+@media (max-width: 600px) {
+  .appt-body {
+    padding: clamp(16px, 3vw, 32px) 0;
+  }
+
+  .appt-container {
+    padding: 0 clamp(12px, 3vw, 20px);
+  }
+
+  .appt-grid {
+    gap: clamp(12px, 2vw, 20px);
+  }
+
+  .appt-right {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .appt-card {
+    padding: 16px 14px;
+  }
+
+  .appt-steps {
+    margin-bottom: clamp(12px, 2vw, 20px);
+  }
+
+  .appt-step-btn {
+    padding: 11px 6px;
+    font-size: 11px;
+  }
+
+  .appt-step-num {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .appt-service-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+  }
+
+  .appt-serv-card {
+    padding: 14px 10px;
+  }
+
+  .appt-serv-card__icon { font-size: 20px; }
+  .appt-serv-card__name { font-size: 12px; }
+
+  .appt-time-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .appt-time-slot {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+
+  .appt-stats-row {
+    gap: 10px;
+  }
+
+  .appt-stat {
+    padding: 14px 6px;
+  }
+
+  .appt-stat strong { font-size: 18px; }
+  .appt-stat span { font-size: 9px; }
+
+  .appt-brow {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .appt-brow__name { font-size: 11px; }
+
+  .appt-info-card {
+    padding: 18px 16px;
+  }
+
+  .appt-info-title {
+    font-size: clamp(16px, 2vw, 20px);
+  }
+
+  .appt-info-sub {
+    font-size: 12px;
+  }
+
+  .appt-form__input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .appt-next-btn,
+  .appt-submit-btn,
+  .appt-back-btn {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+
+  .appt-hero__title {
+    font-size: clamp(24px, 5vw, 40px);
+  }
+
+  .appt-hero__sub {
+    font-size: clamp(12px, 1.8vw, 15px);
+  }
+
+  .appt-day {
+    min-height: 48px;
+    padding: 5px 2px 4px;
+  }
+
+  .appt-day__num { font-size: 11px; }
+  .appt-day__count { font-size: 7px; }
+  .appt-weekdays span { font-size: 8px; }
+
+  .appt-cal-legend {
+    gap: 10px;
+  }
+
+  .appt-cal-legend span {
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — EXTRA SMALL MOBILE (≤ 400px)
+   ========================================================= */
+@media (max-width: 400px) {
+  .appt-hero__content {
+    padding: 16px 14px;
+  }
+
+  .appt-hero__title {
+    font-size: clamp(20px, 4vw, 32px);
+  }
+
+  .appt-hero__badges {
+    gap: 4px;
+  }
+
+  .appt-hero__badge {
+    font-size: 9px;
+    padding: 5px 8px;
+  }
+
+  .appt-step-label { display: none; }
+
+  .appt-service-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .appt-time-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
+
+  .appt-time-slot {
+    padding: 6px 3px;
+    font-size: 10px;
+  }
+
+  .appt-stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .appt-brow__dots { display: none; }
+
+  .appt-day {
+    min-height: 40px;
+    border-radius: 6px;
+  }
+
+  .appt-day__num { font-size: 10px; }
+  .appt-day__count { display: none; }
+
+  .appt-card {
+    padding: 14px 12px;
+  }
+
+  .appt-form__input {
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+
+  .appt-next-btn,
+  .appt-submit-btn {
+    width: calc(100% - 0px);
+    font-size: 12px;
+    padding: 11px 16px;
+  }
+
+  .appt-back-btn {
+    font-size: 11px;
+    padding: 10px 14px;
+  }
+
+  .appt-month-badge { font-size: 9px; }
+}
+
+/* =========================================================
+   RESPONSIVE — ADMIN PANEL MOBILE (≤ 640px)
+   ========================================================= */
+@media (max-width: 640px) {
+  .admin-main {
+    padding: clamp(16px, 2vw, 28px) clamp(12px, 2vw, 24px);
+  }
+
+  .admin-view__title {
+    font-size: clamp(18px, 2.5vw, 24px);
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .admin-stat-card {
+    padding: 16px 14px;
+  }
+
+  .admin-stat-card__value { font-size: 24px; }
+
+  .admin-card {
+    padding: clamp(14px, 2vw, 20px);
+    margin-bottom: 16px;
+  }
+
+  .admin-card__title { font-size: 14px; }
+
+  .admin-day-toggles {
+    gap: 8px;
+  }
+
+  .admin-day-toggle {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .admin-time-toggles {
+    gap: 6px;
+  }
+
+  .admin-time-toggle {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .admin-cal-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .admin-cal-day {
+    min-height: 50px;
+    padding: 6px 4px;
+  }
+
+  .admin-cal-day__num { font-size: 13px; }
+  .admin-cal-day__bk { font-size: 8px; }
+
+  .admin-cap-row {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .admin-cap-row__name { font-size: 12px; }
+  .admin-cap-row__booked { font-size: 10px; }
+
+  .admin-search {
+    width: 100%;
+    font-size: 12px;
+    padding: 9px 12px;
+  }
+
+  .admin-table th { font-size: 9px; padding: 8px 10px; }
+  .admin-table td { font-size: 12px; padding: 11px 10px; }
+
+  .admin-table th:nth-child(3),
+  .admin-table td:nth-child(3) { display: none; }
+
+  .admin-table th:nth-child(5),
+  .admin-table td:nth-child(5) { display: none; }
+}
+
+/* =========================================================
+   RESPONSIVE — ADMIN PANEL MOBILE VERTICAL (≤ 580px)
+   ========================================================= */
+@media (max-width: 580px) {
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+  }
+
+  .admin-sidebar__brand {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px 14px;
+    border-bottom: none;
+    border-right: 1px solid rgba(255,255,255,0.10);
+    margin-bottom: 0;
+  }
+
+  .admin-sidebar__nav {
+    flex: 2;
+    flex-direction: row;
+    padding: 8px 6px;
+    gap: 2px;
+  }
+
+  .admin-sidebar__footer { display: none; }
+
+  .admin-nav-btn {
+    padding: 7px 8px;
+    font-size: 10px;
+    gap: 6px;
+  }
+
+  .admin-nav-btn span { display: none; }
+
+  .admin-main {
+    padding: clamp(14px, 2vw, 24px) clamp(10px, 2vw, 16px);
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .admin-stat-card {
+    padding: 14px 12px;
+  }
+
+  .admin-stat-card__value { font-size: 20px; }
+
+  .admin-cal-day {
+    min-height: 44px;
+    padding: 4px 2px;
+  }
+
+  .admin-weekdays span { font-size: 8px; }
+  .admin-cal-day__num { font-size: 11px; }
+  .admin-cal-day__bk { font-size: 7px; }
+
+  .admin-cap-grid {
+    gap: 8px;
+  }
+
+  .admin-table th:nth-child(4),
+  .admin-table td:nth-child(4),
+  .admin-table th:nth-child(6),
+  .admin-table td:nth-child(6) { display: none; }
 }

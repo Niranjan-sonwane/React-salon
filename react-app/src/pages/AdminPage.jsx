@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useBooking } from "../context/BookingContext"
 import { useAuth } from "../context/AuthContext"
 
-/* ─── Helpers ─── */
+/* â”€â”€â”€ Helpers â”€â”€â”€ */
 const pad = (v) => String(v).padStart(2, "0")
 const getDateKey = (date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
@@ -30,13 +30,32 @@ const buildCalendar = (date) => {
 
 const WEEK_DAYS    = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const DAY_NAMES    = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-const ALL_POSSIBLE_TIMES = [
-  "09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30",
-  "13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30",
-  "17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30","21:00",
-]
+const normalizeTime = (value) => {
+  if (!value) return ""
+  const match = value.match(/^([01]\d|2[0-3]):([0-5]\d)$/)
+  return match ? `${match[1]}:${match[2]}` : ""
+}
 
-/* ─── Admin Panel Views ─── */
+const sortTimeSlots = (slots) => {
+  const unique = new Set()
+  slots.forEach((slot) => {
+    const normalized = normalizeTime(slot)
+    if (normalized) unique.add(normalized)
+  })
+  return Array.from(unique).sort((a, b) => a.localeCompare(b))
+}
+
+const formatSlotLabel = (time) => {
+  const normalized = normalizeTime(time)
+  if (!normalized) return time
+  const [hourStr, minuteStr] = normalized.split(":")
+  const hour24 = Number(hourStr)
+  const meridiem = hour24 >= 12 ? "PM" : "AM"
+  const hour12 = hour24 % 12 || 12
+  return `${hour12.toString().padStart(2, "0")}:${minuteStr} ${meridiem}`
+}
+
+/* â”€â”€â”€ Admin Panel Views â”€â”€â”€ */
 const VIEWS = ["dashboard", "calendar", "bookings"]
 
 export default function AdminPage() {
@@ -68,6 +87,8 @@ export default function AdminPage() {
   const [selectedDay, setSelectedDay] = useState(null)  // YYYY-MM-DD
   const [bookFilter,  setBookFilter]  = useState("")
   const [confirmDel,  setConfirmDel]  = useState(null)  // booking id
+  const [newGlobalSlot, setNewGlobalSlot] = useState("")
+  const [newDaySlot, setNewDaySlot] = useState("")
 
   const calendar = buildCalendar(calDate)
 
@@ -76,7 +97,7 @@ export default function AdminPage() {
     const today7  = new Date(today); today7.setDate(today7.getDate() + 7)
     const upcoming = bookings.filter(b => b.date >= todayKey)
     const thisWeek = bookings.filter(b => b.date >= todayKey && b.date <= getDateKey(today7))
-    const revenue  = bookings.length * 500  // demo: ₹500 avg per booking
+    const revenue  = bookings.length * 500  // demo: â‚¹500 avg per booking
     return { total: bookings.length, upcoming: upcoming.length, thisWeek: thisWeek.length, revenue }
   }, [bookings, todayKey])
 
@@ -117,7 +138,7 @@ export default function AdminPage() {
     const cfg = getDayConfig(selectedDay)
     const slots = cfg.timeSlots.includes(time)
       ? cfg.timeSlots.filter(t => t !== time)
-      : [...cfg.timeSlots, time].sort()
+      : sortTimeSlots([...cfg.timeSlots, time])
     setDayConfig(selectedDay, { timeSlots: slots })
   }
 
@@ -141,19 +162,50 @@ export default function AdminPage() {
     updateShopConfig(prev => ({
       ...prev,
       defaultTimeSlots: prev.defaultTimeSlots.includes(time)
-        ? prev.defaultTimeSlots.filter(t => t !== time).sort()
-        : [...prev.defaultTimeSlots, time].sort()
+        ? sortTimeSlots(prev.defaultTimeSlots.filter(t => t !== time))
+        : sortTimeSlots([...prev.defaultTimeSlots, time])
     }))
   }
 
+  const addGlobalTime = () => {
+    const slot = normalizeTime(newGlobalSlot)
+    if (!slot) return
+    updateShopConfig((prev) => ({
+      ...prev,
+      defaultTimeSlots: sortTimeSlots([...prev.defaultTimeSlots, slot]),
+    }))
+    setNewGlobalSlot("")
+  }
+
+  const removeGlobalTime = (time) => {
+    updateShopConfig((prev) => ({
+      ...prev,
+      defaultTimeSlots: sortTimeSlots(prev.defaultTimeSlots.filter((slot) => slot !== time)),
+    }))
+  }
+
+  const addDayTime = () => {
+    if (!selectedDay) return
+    const slot = normalizeTime(newDaySlot)
+    if (!slot) return
+    const cfg = getDayConfig(selectedDay)
+    setDayConfig(selectedDay, { timeSlots: sortTimeSlots([...cfg.timeSlots, slot]) })
+    setNewDaySlot("")
+  }
+
+  const daySlotPool = useMemo(() => {
+    if (!dayConfigForEdit) return sortTimeSlots(shopConfig.defaultTimeSlots)
+    return sortTimeSlots([...shopConfig.defaultTimeSlots, ...dayConfigForEdit.timeSlots])
+  }, [shopConfig.defaultTimeSlots, dayConfigForEdit])
+
   return (
     <div className="admin-shell">
-      {/* ─────────────── Sidebar ─────────────── */}
+      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <aside className="admin-sidebar">
         <div className="admin-sidebar__brand">
-          <span className="admin-sidebar__logo">💅</span>
+          <span className="admin-sidebar__logo">ðŸ’…</span>
           <div>
-            <p className="admin-sidebar__name">Leela's Lounge</p>
+            <p className="admin-sidebar__name">Dazzler Beauty</p>
             <p className="admin-sidebar__role">Admin Panel</p>
           </div>
         </div>
@@ -190,10 +242,10 @@ export default function AdminPage() {
         </div>
       </aside>
 
-      {/* ─────────────── Main ─────────────── */}
+      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <main className="admin-main">
 
-        {/* ════ DASHBOARD ════ */}
+        {/* â•â•â•â• DASHBOARD â•â•â•â• */}
         {view === "dashboard" && (
           <div className="admin-view">
             <div className="admin-view__head">
@@ -204,10 +256,10 @@ export default function AdminPage() {
             {/* Stats */}
             <div className="admin-stats-grid">
               {[
-                { label:"Total Bookings",   value:stats.total,         icon:"📋", color:"blue"   },
-                { label:"Upcoming",         value:stats.upcoming,      icon:"📅", color:"purple" },
-                { label:"This Week",        value:stats.thisWeek,      icon:"🗓️", color:"amber"  },
-                { label:"Est. Revenue (₹)", value:`₹${stats.revenue.toLocaleString()}`, icon:"💰", color:"green" },
+                { label:"Total Bookings",   value:stats.total,         icon:"ðŸ“‹", color:"blue"   },
+                { label:"Upcoming",         value:stats.upcoming,      icon:"ðŸ“…", color:"purple" },
+                { label:"This Week",        value:stats.thisWeek,      icon:"ðŸ—“ï¸", color:"amber"  },
+                { label:"Est. Revenue (â‚¹)", value:`â‚¹${stats.revenue.toLocaleString()}`, icon:"ðŸ’°", color:"green" },
               ].map(s => (
                 <div key={s.label} className={`admin-stat-card admin-stat-card--${s.color}`}>
                   <span className="admin-stat-card__icon">{s.icon}</span>
@@ -241,18 +293,39 @@ export default function AdminPage() {
             <div className="admin-card">
               <div className="admin-card__head">
                 <h2 className="admin-card__title">Default Time Slots</h2>
-                <p className="admin-card__sub">These slots apply to all dates unless overridden per day.</p>
+                <p className="admin-card__sub">Create slots dynamically. These apply to all dates unless overridden per day.</p>
               </div>
+
+              <div className="admin-time-builder">
+                <input
+                  type="time"
+                  className="admin-time-input"
+                  value={newGlobalSlot}
+                  onChange={(e) => setNewGlobalSlot(e.target.value)}
+                />
+                <button type="button" className="admin-time-add" onClick={addGlobalTime}>Add Slot</button>
+              </div>
+
               <div className="admin-time-toggles">
-                {ALL_POSSIBLE_TIMES.map(t => (
-                  <button
-                    key={t}
-                    type="button"
-                    className={`admin-time-toggle${shopConfig.defaultTimeSlots.includes(t)?" is-on":""}`}
-                    onClick={() => toggleGlobalTime(t)}
-                  >
-                    {t}
-                  </button>
+                {sortTimeSlots(shopConfig.defaultTimeSlots).map((t) => (
+                  <div key={t} className="admin-time-chip">
+                    <button
+                      type="button"
+                      className={`admin-time-toggle${shopConfig.defaultTimeSlots.includes(t)?" is-on":""}`}
+                      onClick={() => toggleGlobalTime(t)}
+                    >
+                      {formatSlotLabel(t)}
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-time-remove"
+                      onClick={() => removeGlobalTime(t)}
+                      aria-label={`Remove ${formatSlotLabel(t)}`}
+                      title="Remove slot"
+                    >
+                      x
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -261,7 +334,7 @@ export default function AdminPage() {
             <div className="admin-card">
               <div className="admin-card__head">
                 <h2 className="admin-card__title">Recent Bookings</h2>
-                <button className="admin-view-all-btn" onClick={() => setView("bookings")}>View All →</button>
+                <button className="admin-view-all-btn" onClick={() => setView("bookings")}>View All â†’</button>
               </div>
               {bookings.length === 0
                 ? <p className="admin-empty">No bookings yet.</p>
@@ -277,7 +350,7 @@ export default function AdminPage() {
                             <td><strong>{b.name}</strong><br/><small>{b.phone}</small></td>
                             <td>{BASE_SERVICES.find(s=>s.id===b.serviceId)?.icon} {BASE_SERVICES.find(s=>s.id===b.serviceId)?.title}</td>
                             <td>{readableDate(b.date)}</td>
-                            <td>{b.time}</td>
+                            <td>{formatSlotLabel(b.time)}</td>
                             <td><span className={`admin-badge admin-badge--${b.date>=todayKey?"upcoming":"past"}`}>{b.date>=todayKey?"Upcoming":"Past"}</span></td>
                           </tr>
                         ))}
@@ -290,7 +363,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ════ CALENDAR / MANAGE DAYS ════ */}
+        {/* â•â•â•â• CALENDAR / MANAGE DAYS â•â•â•â• */}
         {view === "calendar" && (
           <div className="admin-view">
             <div className="admin-view__head">
@@ -381,8 +454,8 @@ export default function AdminPage() {
 
                     <div className={`admin-day-open-badge${dayConfigForEdit.isOpen?"":" is-closed"}`}>
                       {dayConfigForEdit.isOpen
-                        ? <><span>🟢</span> Shop is Open</>
-                        : <><span>🔴</span> Shop is Closed</>
+                        ? <><span>ðŸŸ¢</span> Shop is Open</>
+                        : <><span>ðŸ”´</span> Shop is Closed</>
                       }
                     </div>
 
@@ -391,16 +464,27 @@ export default function AdminPage() {
                         {/* Time Slots Override */}
                         <div className="admin-editor-section">
                           <h3 className="admin-editor-section__title">Time Slots for This Day</h3>
-                          <p className="admin-editor-section__sub">Toggle individual slots on/off.</p>
+                          <p className="admin-editor-section__sub">Add or toggle slots for this specific date.</p>
+
+                          <div className="admin-time-builder">
+                            <input
+                              type="time"
+                              className="admin-time-input"
+                              value={newDaySlot}
+                              onChange={(e) => setNewDaySlot(e.target.value)}
+                            />
+                            <button type="button" className="admin-time-add" onClick={addDayTime}>Add Slot</button>
+                          </div>
+
                           <div className="admin-time-toggles">
-                            {ALL_POSSIBLE_TIMES.map(t => (
+                            {daySlotPool.map(t => (
                               <button
                                 key={t}
                                 type="button"
                                 className={`admin-time-toggle${dayConfigForEdit.timeSlots.includes(t)?" is-on":""}`}
                                 onClick={() => toggleTime(t)}
                               >
-                                {t}
+                                {formatSlotLabel(t)}
                               </button>
                             ))}
                           </div>
@@ -428,7 +512,7 @@ export default function AdminPage() {
                                       className="admin-cap-btn"
                                       onClick={() => setServiceCap(s.id, s.capacity - 1)}
                                       disabled={s.capacity <= 0}
-                                    >−</button>
+                                    >âˆ’</button>
                                     <span className="admin-cap-val">{s.capacity}</span>
                                     <button
                                       className="admin-cap-btn"
@@ -448,7 +532,7 @@ export default function AdminPage() {
 
               {!selectedDay && (
                 <div className="admin-select-prompt">
-                  <span className="admin-select-prompt__icon">📅</span>
+                  <span className="admin-select-prompt__icon">ðŸ“…</span>
                   <p>Click any date on the calendar to customize it.</p>
                 </div>
               )}
@@ -456,7 +540,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ════ BOOKINGS ════ */}
+        {/* â•â•â•â• BOOKINGS â•â•â•â• */}
         {view === "bookings" && (
           <div className="admin-view">
             <div className="admin-view__head">
@@ -468,7 +552,7 @@ export default function AdminPage() {
             {confirmDel && (
               <div className="appt-modal-overlay" onClick={() => setConfirmDel(null)}>
                 <div className="appt-modal" onClick={e => e.stopPropagation()}>
-                  <div className="appt-modal__icon">⚠️</div>
+                  <div className="appt-modal__icon">âš ï¸</div>
                   <h3 className="appt-modal__title">Cancel Booking?</h3>
                   <p className="appt-modal__body">This will permanently remove the booking. This action cannot be undone.</p>
                   <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
@@ -487,7 +571,7 @@ export default function AdminPage() {
               <div className="admin-card__head">
                 <input
                   className="admin-search"
-                  placeholder="Search by name, date, service, phone…"
+                  placeholder="Search by name, date, service, phoneâ€¦"
                   value={bookFilter}
                   onChange={e => setBookFilter(e.target.value)}
                 />
@@ -527,7 +611,7 @@ export default function AdminPage() {
                               </td>
                               <td>
                                 <strong>{readableDate(b.date)}</strong>
-                                <br/><span className="admin-time-badge">{b.time}</span>
+                                <br/><span className="admin-time-badge">{formatSlotLabel(b.time)}</span>
                               </td>
                               <td>
                                 <span className={`admin-badge admin-badge--${isPast?"past":"upcoming"}`}>
@@ -559,3 +643,4 @@ export default function AdminPage() {
     </div>
   )
 }
+
