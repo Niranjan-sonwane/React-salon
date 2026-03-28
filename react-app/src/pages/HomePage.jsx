@@ -65,7 +65,7 @@ const CSS = `
   height: 100%;
   object-fit: cover;
   object-position: center top;
-  opacity: .72;              /* FIX: was .55  too dark; raised for better image show */
+  opacity: 0.92;             /* increased opacity to make image brighter */
   display: block;
 }
 
@@ -77,9 +77,9 @@ const CSS = `
   background:
     linear-gradient(
       to right,
-      rgba(26,21,16,.85) 0%,
-      rgba(26,21,16,.45) 45%,
-      rgba(26,21,16,.15) 100%
+      rgba(26,21,16,.65) 0%,
+      rgba(26,21,16,.15) 45%,
+      transparent 100%
     );
 }
 

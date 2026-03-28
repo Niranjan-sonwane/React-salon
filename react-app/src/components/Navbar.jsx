@@ -63,7 +63,7 @@ function Navbar() {
         }
 
         /*  MAIN BAR 
-           height: 72px is the single source of truth.
+           height: 90px is the single source of truth.
            overflow: hidden ensures the logo never bleeds outside. */
         .ll-nav-bar {
           max-width: 1320px;
@@ -72,7 +72,7 @@ function Navbar() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          height: 72px;
+          height: 90px;
           overflow: visible;
         }
 
@@ -203,23 +203,25 @@ function Navbar() {
         }
 
         /*  LOGO 
-           KEY FIX: max-height: 52px keeps logo inside the 72px bar always.
+           KEY FIX: max-height: 75px keeps logo inside the 90px bar always.
            The parent has overflow:hidden as a second safeguard. */
         .ll-nav-logo {
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 0 clamp(12px, 1.8vw, 28px);
-          height: 72px;
+          height: 90px;
           overflow: hidden;
         }
         .ll-nav-logo img {
           width: auto;
-          max-width: clamp(64px, 7.5vw, 100px);
-          max-height: 52px;
+          max-width: clamp(100px, 15vw, 180px);
+          max-height: 78px;
           object-fit: contain;
           display: block;
           transition: opacity 0.2s;
+          mix-blend-mode: multiply;
+          filter: contrast(1.1) brightness(1.08); /* Forces off-white background to pure white to fix the grey rectangle */
         }
         .ll-nav-logo:hover img { opacity: 0.82; }
 
