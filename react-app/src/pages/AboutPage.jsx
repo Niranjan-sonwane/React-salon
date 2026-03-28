@@ -1,4 +1,4 @@
-﻿const styles = `
+const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;700&display=swap');
 
   .ab-root,
@@ -24,7 +24,7 @@
     padding: clamp(58px, 10vw, 124px) clamp(18px, 6vw, 72px) clamp(46px, 8vw, 92px);
     background:
       linear-gradient(120deg, rgba(26, 21, 16, 0.88), rgba(26, 21, 16, 0.52)),
-      url('/images/banner/about.jpg') center/cover no-repeat;
+      url('/images/nails images/1.jpeg') center/cover no-repeat;
   }
 
   .ab-hero-inner {
@@ -231,7 +231,7 @@ function AboutPage() {
         <section className="ab-wrap">
           <div className="ab-grid">
             <figure className="ab-media">
-              <img src="/images/resources/about.jpg" alt="About Dazzler Beauty" loading="lazy" />
+              <img src="/images/nails images/2.jpeg" alt="About Dazzler Beauty" loading="lazy" />
             </figure>
 
             <article className="ab-content">

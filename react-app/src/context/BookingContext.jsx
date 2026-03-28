@@ -28,6 +28,8 @@ export function BookingProvider({ children }) {
       const bookRes = await fetchApi("/admin/bookings")
       if (bookRes?.bookings) setBookings(bookRes.bookings)
     } catch (err) {
+      // 401 is expected when the user is not logged in as admin.
+      if (err?.status === 401) return
       console.error("Failed to load admin data", err)
     }
   }, [])

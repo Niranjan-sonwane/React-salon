@@ -48,7 +48,7 @@
     border-radius: 50%;
   }
 
-  /* â”€â”€ TOP â”€â”€ */
+  /*  TOP  */
   .ft-top {
     padding: clamp(56px, 8vw, 96px) clamp(24px, 6vw, 80px) clamp(48px, 6vw, 72px);
     display: grid;
@@ -199,7 +199,7 @@
     margin: 0 clamp(24px, 6vw, 80px);
   }
 
-  /* â”€â”€ BOTTOM â”€â”€ */
+  /*  BOTTOM  */
   .ft-bottom {
     padding: clamp(20px, 3vw, 28px) clamp(24px, 6vw, 80px);
     display: flex;
@@ -311,7 +311,7 @@ export default function Footer() {
       <footer className="ft-root">
         <div className="ft-deco" />
 
-        {/* â”€â”€ Top â”€â”€ */}
+        {/*  Top  */}
         <div className="ft-top">
 
           {/* Brand + newsletter */}
@@ -334,7 +334,7 @@ export default function Footer() {
                 <div className="ft-contact-icon"><IconPin /></div>
                 <p className="ft-contact-text">
                   Shop 406 &amp; 407, 4th Floor, Citadel PRISM Business Center,
-                  PVS Kalalkunj Road, Kodialbail, Mangaluru â€“ 575 003
+                  PVS Kalalkunj Road, Kodialbail, Mangaluru  575 003
                 </p>
               </li>
               <li className="ft-contact-item">
@@ -362,9 +362,9 @@ export default function Footer() {
 
         <div className="ft-divider" />
 
-        {/* â”€â”€ Bottom â”€â”€ */}
+        {/*  Bottom  */}
         <div className="ft-bottom">
-          <span className="ft-copy">Â© 2026 Dazzler Beauty. All rights reserved.</span>
+          <span className="ft-copy"> 2026 Dazzler Beauty. All rights reserved.</span>
           <div className="ft-legal">
             <a href="#">Privacy Policy</a>
             <div className="ft-legal-dot" />
@@ -375,3 +375,4 @@ export default function Footer() {
     </>
   )
 }
+

@@ -843,7 +843,7 @@ input, select, textarea { font-family: inherit; }
   top: 100px;
 }
 
-/* We only want the first card sticky — remove sticky from all children */
+/* We only want the first card sticky  remove sticky from all children */
 .appt-right > .appt-card { position: static; }
 
 /* Info card */
@@ -1020,7 +1020,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — LARGE TABLET (≤ 1100px)
+   RESPONSIVE  LARGE TABLET ( 1100px)
    ========================================================= */
 @media (max-width: 1100px) {
   .appt-grid {
@@ -1036,7 +1036,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — TABLET (≤ 768px)
+   RESPONSIVE  TABLET ( 768px)
    ========================================================= */
 @media (max-width: 768px) {
   .appt-step-label { display: none; }
@@ -1087,7 +1087,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — SMALL MOBILE (≤ 480px)
+   RESPONSIVE  SMALL MOBILE ( 480px)
    ========================================================= */
 @media (max-width: 480px) {
   .appt-hero__content {
@@ -1161,7 +1161,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — XS MOBILE (≤ 360px)
+   RESPONSIVE  XS MOBILE ( 360px)
    ========================================================= */
 @media (max-width: 360px) {
   .appt-time-grid {
@@ -1180,7 +1180,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   APPOINTMENT — EXTRA STATES (closed days, full service)
+   APPOINTMENT  EXTRA STATES (closed days, full service)
    ========================================================= */
 
 /* Closed calendar day */
@@ -1266,7 +1266,7 @@ input, select, textarea { font-family: inherit; }
 .appt-success-banner button:hover { background: rgba(74,222,128,0.2); }
 
 /* =========================================================
-   APPOINTMENT — FULL-CAPACITY MODAL
+   APPOINTMENT  FULL-CAPACITY MODAL
    ========================================================= */
 .appt-modal-overlay {
   position: fixed;
@@ -1337,7 +1337,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   NAVBAR — ADMIN PILL BUTTON
+   NAVBAR  ADMIN PILL BUTTON
    ========================================================= */
 
 /* Give the container a positioning context */
@@ -1346,7 +1346,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 .admin-nav-item {
-  display: none; /* was in ul, now removed — kept for safety */
+  display: none; /* was in ul, now removed  kept for safety */
 }
 
 .admin-nav-pill {
@@ -1365,7 +1365,7 @@ input, select, textarea { font-family: inherit; }
   transition: all 0.2s ease;
   white-space: nowrap;
 
-  /* Fixed to viewport top-right — completely outside the float layout */
+  /* Fixed to viewport top-right  completely outside the float layout */
   position: fixed;
   right: 20px;
   top: 18px;
@@ -1383,7 +1383,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   ADMIN PANEL — FULL LAYOUT
+   ADMIN PANEL  FULL LAYOUT
    ========================================================= */
 .admin-shell {
   display: flex;
@@ -1392,7 +1392,7 @@ input, select, textarea { font-family: inherit; }
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
-/* ── Sidebar ── */
+/*  Sidebar  */
 .admin-sidebar {
   width: 240px;
   flex-shrink: 0;
@@ -1490,7 +1490,7 @@ input, select, textarea { font-family: inherit; }
 
 .admin-back-link:hover { color: #fff; }
 
-/* ── Main Area ── */
+/*  Main Area  */
 .admin-main {
   flex: 1;
   min-width: 0;
@@ -1517,7 +1517,7 @@ input, select, textarea { font-family: inherit; }
   margin: 0;
 }
 
-/* ── Stat Cards ── */
+/*  Stat Cards  */
 .admin-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -1545,7 +1545,7 @@ input, select, textarea { font-family: inherit; }
 .admin-stat-card--amber  { border-top: 3px solid #f59e0b; }
 .admin-stat-card--green  { border-top: 3px solid #22c55e; }
 
-/* ── Generic Card ── */
+/*  Generic Card  */
 .admin-card {
   background: #fff;
   border-radius: 20px;
@@ -1591,7 +1591,7 @@ input, select, textarea { font-family: inherit; }
 
 .admin-view-all-btn:hover { background: var(--c-brand-pale); }
 
-/* ── Day toggles (open/closed per weekday) ── */
+/*  Day toggles (open/closed per weekday)  */
 .admin-day-toggles {
   display: flex;
   flex-wrap: wrap;
@@ -1622,7 +1622,7 @@ input, select, textarea { font-family: inherit; }
   color: var(--c-brand-dark);
 }
 
-/* ── Time slot toggles ── */
+/*  Time slot toggles  */
 .admin-time-builder {
   display: flex;
   align-items: center;
@@ -1715,7 +1715,7 @@ input, select, textarea { font-family: inherit; }
   border-color: #b24d3f;
 }
 
-/* ── Calendar (admin) ── */
+/*  Calendar (admin)  */
 .admin-cal-layout {
   display: grid;
   grid-template-columns: 1fr 420px;
@@ -1877,7 +1877,7 @@ input, select, textarea { font-family: inherit; }
 .admin-dot--closed   { background: #d1d5db; }
 .admin-dot--override { background: var(--c-brand); }
 
-/* ── Day Editor ── */
+/*  Day Editor  */
 .admin-day-editor { margin-bottom: 0; }
 
 .admin-toggle-btn {
@@ -1955,7 +1955,7 @@ input, select, textarea { font-family: inherit; }
   margin-bottom: 12px;
 }
 
-/* ── Capacity grid ── */
+/*  Capacity grid  */
 .admin-cap-grid {
   display: grid;
   gap: 10px;
@@ -2033,7 +2033,7 @@ input, select, textarea { font-family: inherit; }
   color: #2c1a0e;
 }
 
-/* ── Select prompt ── */
+/*  Select prompt  */
 .admin-select-prompt {
   display: flex;
   flex-direction: column;
@@ -2049,7 +2049,7 @@ input, select, textarea { font-family: inherit; }
 
 .admin-select-prompt__icon { font-size: 36px; }
 
-/* ── Bookings Table ── */
+/*  Bookings Table  */
 .admin-search {
   padding: 10px 16px;
   border-radius: 12px;
@@ -2174,7 +2174,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   ADMIN — RESPONSIVE
+   ADMIN  RESPONSIVE
    ========================================================= */
 @media (max-width: 1000px) {
   .admin-cal-layout {
@@ -2228,7 +2228,7 @@ input, select, textarea { font-family: inherit; }
   .admin-table td:nth-child(5) { display: none; }
 }
 /* =========================================================
-   NAVBAR — ADMIN ICON BUTTON (replaces pill)
+   NAVBAR  ADMIN ICON BUTTON (replaces pill)
    ========================================================= */
 .admin-nav-pill { display: none !important; }
 
@@ -2259,7 +2259,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   ADMIN — SIDEBAR LOGOUT BUTTON
+   ADMIN  SIDEBAR LOGOUT BUTTON
    ========================================================= */
 .admin-logout-btn {
   display: flex;
@@ -2298,7 +2298,7 @@ input, select, textarea { font-family: inherit; }
   width: 42%;
   flex-shrink: 0;
   position: relative;
-  background: url('/images/banner/about.jpg') center/cover no-repeat;
+  background: url('/images/nails images/1.jpeg') center/cover no-repeat;
   display: flex;
   align-items: flex-end;
   padding: clamp(30px,5vw,60px);
@@ -2604,7 +2604,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   NAVBAR — RESPONSIVE HEADER
+   NAVBAR  RESPONSIVE HEADER
    ========================================================= */
 @media (max-width: 768px) {
   .site-header { padding: 0; }
@@ -2777,7 +2777,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   FOOTER — RESPONSIVE
+   FOOTER  RESPONSIVE
    ========================================================= */
 @media (max-width: 768px) {
   .site-footer {
@@ -2950,7 +2950,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   ACCESSIBILITY — TEXT SIZING FOR ALL DEVICES
+   ACCESSIBILITY  TEXT SIZING FOR ALL DEVICES
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -2982,7 +2982,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — ENHANCED MOBILE (≤ 600px)
+   RESPONSIVE  ENHANCED MOBILE ( 600px)
    ========================================================= */
 @media (max-width: 600px) {
   .appt-body {
@@ -3112,7 +3112,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — EXTRA SMALL MOBILE (≤ 400px)
+   RESPONSIVE  EXTRA SMALL MOBILE ( 400px)
    ========================================================= */
 @media (max-width: 400px) {
   .appt-hero__content {
@@ -3187,7 +3187,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — ADMIN PANEL MOBILE (≤ 640px)
+   RESPONSIVE  ADMIN PANEL MOBILE ( 640px)
    ========================================================= */
 @media (max-width: 640px) {
   .admin-main {
@@ -3272,7 +3272,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* =========================================================
-   RESPONSIVE — ADMIN PANEL MOBILE VERTICAL (≤ 580px)
+   RESPONSIVE  ADMIN PANEL MOBILE VERTICAL ( 580px)
    ========================================================= */
 @media (max-width: 580px) {
   .admin-sidebar {
@@ -3344,3 +3344,4 @@ input, select, textarea { font-family: inherit; }
   .admin-table th:nth-child(6),
   .admin-table td:nth-child(6) { display: none; }
 }
+

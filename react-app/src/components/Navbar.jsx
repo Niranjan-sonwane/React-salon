@@ -12,10 +12,16 @@ const serviceLinks = [
   { to: '/waxing',             label: 'Waxing' },
 ]
 
+const galleryLinks = [
+  { to: '/portfolio#nail-art', label: 'Nail Art' },
+  { to: '/portfolio#jewellery', label: 'Jewellery' },
+]
+
 function Navbar() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
+  const [mobileGalleryOpen, setMobileGalleryOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -27,6 +33,7 @@ function Navbar() {
   const closeMenu = () => {
     setMenuOpen(false)
     setMobileServicesOpen(false)
+    setMobileGalleryOpen(false)
   }
 
   return (
@@ -34,7 +41,7 @@ function Navbar() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-        /* â”€â”€ ROOT â”€â”€ */
+        /*  ROOT  */
         .ll-nav {
           position: sticky;
           top: 0;
@@ -48,14 +55,14 @@ function Navbar() {
           box-shadow: 0 4px 28px rgba(26,21,16,0.08);
         }
 
-        /* â”€â”€ GOLD ACCENT STRIP â”€â”€ */
+        /*  GOLD ACCENT STRIP  */
         .ll-nav-accent {
           height: 2px;
           background: linear-gradient(90deg, transparent 0%, #c8a96e 35%, #c8a96e 65%, transparent 100%);
           opacity: 0.45;
         }
 
-        /* â”€â”€ MAIN BAR â”€â”€
+        /*  MAIN BAR 
            height: 72px is the single source of truth.
            overflow: hidden ensures the logo never bleeds outside. */
         .ll-nav-bar {
@@ -69,7 +76,7 @@ function Navbar() {
           overflow: visible;
         }
 
-        /* â”€â”€ LEFT / RIGHT NAVS â”€â”€ */
+        /*  LEFT / RIGHT NAVS  */
         .ll-nav-left {
           display: flex;
           align-items: center;
@@ -83,7 +90,7 @@ function Navbar() {
           justify-content: flex-end;
         }
 
-        /* â”€â”€ NAV LINKS â”€â”€ */
+        /*  NAV LINKS  */
         .ll-nav-link {
           font-size: 11px;
           font-weight: 500;
@@ -109,7 +116,7 @@ function Navbar() {
         .ll-nav-link:hover::after,
         .ll-nav-link.active::after { width: 100%; }
 
-        /* â”€â”€ SERVICES DROPDOWN â”€â”€ */
+        /*  SERVICES DROPDOWN  */
         .ll-nav-services { position: relative; }
         .ll-nav-service-btn {
           font-size: 11px;
@@ -195,7 +202,7 @@ function Navbar() {
           padding-left: 18px;
         }
 
-        /* â”€â”€ LOGO â”€â”€
+        /*  LOGO 
            KEY FIX: max-height: 52px keeps logo inside the 72px bar always.
            The parent has overflow:hidden as a second safeguard. */
         .ll-nav-logo {
@@ -216,7 +223,7 @@ function Navbar() {
         }
         .ll-nav-logo:hover img { opacity: 0.82; }
 
-        /* â”€â”€ CONTACT BUTTON â”€â”€ */
+        /*  CONTACT BUTTON  */
         .ll-nav-pill {
           font-size: 11px;
           font-weight: 600;
@@ -234,7 +241,7 @@ function Navbar() {
         .ll-nav-pill:hover { background: #c8a96e; color: #1a1510 !important; }
         .ll-nav-pill.active { background: #c8a96e; color: #1a1510 !important; }
 
-        /* â”€â”€ ADMIN BTN â”€â”€ single circle, no duplicate â”€â”€ */
+        /*  ADMIN BTN  single circle, no duplicate  */
         .ll-nav-admin {
           width: 34px; height: 34px;
           border: 1px solid rgba(26,21,16,0.14);
@@ -254,7 +261,7 @@ function Navbar() {
           border-color: #1a1510;
         }
 
-        /* â”€â”€ HAMBURGER â€” hidden on desktop â”€â”€ */
+        /*  HAMBURGER  hidden on desktop  */
         .ll-nav-toggle {
           display: none;
           width: 36px; height: 36px;
@@ -289,7 +296,7 @@ function Navbar() {
           border-color: #1a1510;
         }
 
-        /* â”€â”€ MOBILE MENU â”€â”€ */
+        /*  MOBILE MENU  */
         .ll-nav-mobile {
           background: #f7efe3;
           border-top: 1px solid rgba(79, 35, 24, 0.16);
@@ -342,7 +349,7 @@ function Navbar() {
         .ll-nav-mobile-sub a:hover,
         .ll-nav-mobile-sub a.active { color: #1a1510; }
 
-        /* â”€â”€ BREAKPOINT â”€â”€ */
+        /*  BREAKPOINT  */
         @media (max-width: 1040px) {
           .ll-nav-left, .ll-nav-right { display: none; }
           .ll-nav-bar {
@@ -364,10 +371,10 @@ function Navbar() {
 
       <header className={`ll-nav${scrolled ? ' ll-scrolled' : ''}`}>
 
-        {/* â”€â”€ BAR â”€â”€ */}
+        {/*  BAR  */}
         <div className="ll-nav-bar">
 
-          {/* Hamburger â€” CSS shows only on mobile */}
+          {/* Hamburger  CSS shows only on mobile */}
           <button
             type="button"
             className="ll-nav-toggle"
@@ -406,8 +413,8 @@ function Navbar() {
             </div>
           </nav>
 
-          {/* LOGO â€” contained within 72px bar */}
-          <Link to="/" className="ll-nav-logo" aria-label="Dazzler Beauty â€” Home">
+          {/* LOGO  contained within 72px bar */}
+          <Link to="/" className="ll-nav-logo" aria-label="Dazzler Beauty  Home">
             <img src="/images/header.png" alt="Dazzler Beauty" />
           </Link>
 
@@ -427,8 +434,28 @@ function Navbar() {
           <nav className="ll-nav-right" aria-label="Primary right navigation">
             <NavLink to="/appointment" className={({ isActive }) => `ll-nav-link${isActive ? ' active' : ''}`}>Appointment</NavLink>
             <NavLink to="/portfolio"   className={({ isActive }) => `ll-nav-link${isActive ? ' active' : ''}`}>Portfolio</NavLink>
+            <div className="ll-nav-services">
+              <button type="button" className="ll-nav-service-btn" aria-haspopup="true">
+                Gallery
+                <svg className="ll-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+              <div className="ll-nav-dropdown" role="menu">
+                {galleryLinks.map(g => (
+                  <NavLink
+                    key={g.to}
+                    to={g.to}
+                    className={({ isActive }) => `ll-nav-dropdown-link${isActive ? ' active' : ''}`}
+                    role="menuitem"
+                  >
+                    {g.label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
             <NavLink to="/contact"     className={({ isActive }) => `ll-nav-pill${isActive ? ' active' : ''}`}>Contact</NavLink>
-            {/* One admin button â€” no duplicate */}
+            {/* One admin button  no duplicate */}
             <button
               type="button"
               className="ll-nav-admin"
@@ -447,7 +474,7 @@ function Navbar() {
         {/* Gold accent line */}
         <div className="ll-nav-accent" />
 
-        {/* â”€â”€ MOBILE DROPDOWN â”€â”€ */}
+        {/*  MOBILE DROPDOWN  */}
         {menuOpen && (
           <div className="ll-nav-mobile">
             <div className="ll-nav-mobile-inner">
@@ -486,6 +513,37 @@ function Navbar() {
 
               <NavLink to="/appointment" className={({ isActive }) => `ll-nav-mobile-link${isActive ? ' active' : ''}`} onClick={closeMenu}>Appointment</NavLink>
               <NavLink to="/portfolio"   className={({ isActive }) => `ll-nav-mobile-link${isActive ? ' active' : ''}`} onClick={closeMenu}>Portfolio</NavLink>
+
+              <button
+                type="button"
+                className="ll-nav-mobile-link"
+                onClick={() => setMobileGalleryOpen(p => !p)}
+              >
+                Gallery
+                <svg
+                  width="12" height="12" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" strokeWidth="2.5"
+                  style={{ transform: mobileGalleryOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}
+                >
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+
+              {mobileGalleryOpen && (
+                <div className="ll-nav-mobile-sub">
+                  {galleryLinks.map(g => (
+                    <NavLink
+                      key={g.to}
+                      to={g.to}
+                      className={({ isActive }) => isActive ? 'active' : ''}
+                      onClick={closeMenu}
+                    >
+                      {g.label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+
               <NavLink to="/contact"     className={({ isActive }) => `ll-nav-mobile-link${isActive ? ' active' : ''}`} onClick={closeMenu}>Contact</NavLink>
             </div>
           </div>
@@ -497,3 +555,4 @@ function Navbar() {
 }
 
 export default Navbar
+

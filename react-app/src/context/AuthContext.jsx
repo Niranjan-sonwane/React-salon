@@ -1,11 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from "react"
 import { fetchApi } from "../api"
 
-const DEMO_ADMIN = {
-  email: "admin@dazzlerbeauty.com",
-  password: "Admin@2026",
-}
-
 export function validateEmail(email) {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!email || email.trim() === "") return "Email is required."
@@ -26,7 +21,7 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!localStorage.getItem("leela_admin_token") || sessionStorage.getItem("dazzler_admin_auth") === "true"
+    return !!localStorage.getItem("leela_admin_token")
   })
 
   useEffect(() => {
@@ -62,17 +57,6 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true)
       return { ok: true }
     } catch (err) {
-      // Backend can have different seeded credentials across environments.
-      // Keep a deterministic demo fallback for local/admin testing.
-      if (
-        email?.trim().toLowerCase() === DEMO_ADMIN.email &&
-        password === DEMO_ADMIN.password
-      ) {
-        sessionStorage.setItem("dazzler_admin_auth", "true")
-        setIsAuthenticated(true)
-        return { ok: true }
-      }
-
       return {
         ok: false,
         error: err.message || "Failed to login. Please check connection.",

@@ -247,14 +247,14 @@ export default function ContactPage() {
           </div>
           <h1>Let's <i>connect</i></h1>
           <p className="lal-hero-sub">
-            Reach out for appointments, questions, or just to say hello â€” we're always happy to hear from you.
+            Reach out for appointments, questions, or just to say hello  we're always happy to hear from you.
           </p>
         </section>
 
         {/* CONTENT GRID */}
         <div className="lal-grid">
 
-          {/* â”€â”€ Form â”€â”€ */}
+          {/*  Form  */}
           <div className="lal-form-side">
             <p className="lal-side-label">Send us a message</p>
             <div className="lal-fields">
@@ -284,21 +284,21 @@ export default function ContactPage() {
               <div className="lal-field">
                 <label htmlFor="dzMessage">Your Message</label>
                 <textarea id="dzMessage" name="dzMessage" rows="5"
-                  placeholder="Tell us how we can helpâ€¦"
+                  placeholder="Tell us how we can help"
                   value={form.dzMessage} onChange={onChange}
                   aria-required="true" aria-invalid={!!errors.dzMessage} />
                 {errors.dzMessage && <span className="lal-err">{errors.dzMessage}</span>}
               </div>
 
               <button type="button" className="lal-btn" onClick={onSubmit} disabled={loading}>
-                <span>{loading ? 'Sendingâ€¦' : 'Send Message'}</span>
+                <span>{loading ? 'Sending' : 'Send Message'}</span>
                 {!loading && <ArrowIcon />}
               </button>
             </div>
 
             {submitted && (
               <div className="lal-success" role="alert">
-                Thank you â€” your message has been received. We'll be in touch shortly.
+                Thank you  your message has been received. We'll be in touch shortly.
               </div>
             )}
           </div>
@@ -308,3 +308,4 @@ export default function ContactPage() {
     </>
   )
 }
+

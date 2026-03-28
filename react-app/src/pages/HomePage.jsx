@@ -1,10 +1,10 @@
-﻿import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { services } from '../data/services'
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* 
    STYLES
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+ */
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
@@ -20,7 +20,7 @@ const CSS = `
   --border:    rgba(26,21,16,.10);
 }
 
-/* â”€â”€ noise overlay â”€â”€ */
+/*  noise overlay  */
 .hp-noise {
   position:absolute; inset:0; pointer-events:none; z-index:0;
   opacity:.032;
@@ -28,12 +28,12 @@ const CSS = `
   background-size:180px;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* 
    HERO
    FIX: overflow:hidden on wrapper, 
    overlay lightened & even, 
    content padding corrected
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+ */
 .hp-hero {
   position: relative;
   overflow: hidden;          /* prevents peekthrough from adjacent slides */
@@ -65,7 +65,7 @@ const CSS = `
   height: 100%;
   object-fit: cover;
   object-position: center top;
-  opacity: .72;              /* FIX: was .55 â€” too dark; raised for better image show */
+  opacity: .72;              /* FIX: was .55  too dark; raised for better image show */
   display: block;
 }
 
@@ -77,13 +77,13 @@ const CSS = `
   background:
     linear-gradient(
       to right,
-      rgba(26,21,16,.68) 0%,
-      rgba(26,21,16,.32) 55%,
-      rgba(26,21,16,.10) 100%
+      rgba(26,21,16,.85) 0%,
+      rgba(26,21,16,.45) 45%,
+      rgba(26,21,16,.15) 100%
     );
 }
 
-/* FIX: content padding â€” starts from true left edge with proper gutters */
+/* FIX: content padding  starts from true left edge with proper gutters */
 .hp-hero-content {
   position: relative;
   z-index: 2;
@@ -91,7 +91,7 @@ const CSS = `
     clamp(90px, 14vw, 160px)   /* top */
     clamp(24px, 7vw, 96px)     /* right */
     clamp(72px, 10vw, 130px)   /* bottom */
-    clamp(24px, 7vw, 96px);    /* left â€” matches right for symmetry */
+    clamp(24px, 7vw, 96px);    /* left  matches right for symmetry */
   max-width: 660px;
 }
 .hp-hero-eyebrow {
@@ -151,7 +151,7 @@ const CSS = `
   width: 36px;
 }
 
-/* â”€â”€ BUTTONS â”€â”€ */
+/*  BUTTONS  */
 .hp-btn {
   display: inline-flex;
   align-items: center;
@@ -179,7 +179,7 @@ const CSS = `
 }
 .hp-btn-ghost:hover { background: var(--ink); color: var(--cream); }
 
-/* â”€â”€ SECTION SHELL â”€â”€ */
+/*  SECTION SHELL  */
 .hp-section { padding: clamp(64px,9vw,112px) clamp(24px,6vw,80px); position: relative; }
 .hp-container { max-width: 1200px; margin: 0 auto; }
 
@@ -200,7 +200,7 @@ const CSS = `
 .hp-section-title em { font-style: italic; color: var(--accent-dk); }
 .hp-body-text { font-size: 15px; font-weight: 300; color: var(--muted); line-height: 1.78; }
 
-/* â”€â”€ ABOUT â”€â”€ */
+/*  ABOUT  */
 .hp-about { background: var(--cream); }
 .hp-about-grid {
   display: grid; grid-template-columns: 1fr; gap: 52px; align-items: center;
@@ -227,7 +227,7 @@ const CSS = `
   letter-spacing: .08em; margin-bottom: 24px;
 }
 
-/* â”€â”€ SERVICES â”€â”€ */
+/*  SERVICES  */
 .hp-services { background: var(--warm); }
 .hp-services-header { text-align: center; margin-bottom: 48px; }
 .hp-services-header p { font-size: 14px; font-weight: 300; color: var(--muted); margin-top: 10px; }
@@ -273,7 +273,7 @@ const CSS = `
 .hp-srv-arr:hover { background: var(--ink); color: var(--cream); }
 .hp-srv-center { text-align: center; margin-top: 40px; }
 
-/* â”€â”€ BEFORE / AFTER â”€â”€ */
+/*  BEFORE / AFTER  */
 .hp-ba { background: var(--ink); color: var(--cream); }
 .hp-ba-grid {
   display: grid; grid-template-columns: 1fr; gap: 52px; align-items: center;
@@ -317,7 +317,7 @@ const CSS = `
 .hp-ba-label.after  { right: 12px; }
 .hp-ba-label.before { left: 12px; }
 
-/* â”€â”€ WHY US â”€â”€ */
+/*  WHY US  */
 .hp-why { background: var(--cream); }
 .hp-why-grid {
   display: grid; grid-template-columns: 1fr; gap: 52px; align-items: center;
@@ -338,7 +338,7 @@ const CSS = `
 }
 .hp-collage img { width: 100%; height: 100%; object-fit: cover; }
 
-/* â”€â”€ PARALLAX CTA â”€â”€ */
+/*  PARALLAX CTA  */
 .hp-paralax {
   background: var(--ink); text-align: center;
   padding: clamp(72px,10vw,112px) clamp(24px,6vw,80px);
@@ -360,7 +360,7 @@ const CSS = `
   margin-bottom: 34px; position: relative;
 }
 
-/* â”€â”€ PROCESS â”€â”€ */
+/*  PROCESS  */
 .hp-process { background: var(--warm); }
 .hp-process-grid {
   display: grid; grid-template-columns: 1fr; gap: 44px; align-items: center;
@@ -369,7 +369,7 @@ const CSS = `
 .hp-process-img { border: 1px solid var(--border); overflow: hidden; }
 .hp-process-img img { width: 100%; display: block; }
 
-/* â”€â”€ TESTIMONIALS â”€â”€ */
+/*  TESTIMONIALS  */
 .hp-testi { background: var(--cream); }
 .hp-testi-header { text-align: center; margin-bottom: 44px; }
 .hp-testi-wrap { overflow: hidden; }
@@ -405,7 +405,7 @@ const CSS = `
 }
 .hp-testi-dot.active { background: var(--accent); transform: scale(1.4); }
 
-/* â”€â”€ GALLERY â”€â”€ */
+/*  GALLERY  */
 .hp-gallery { overflow: hidden; background: var(--ink); padding: 0; line-height: 0; }
 .hp-gallery-track {
   display: flex; gap: 3px;
@@ -425,7 +425,7 @@ const CSS = `
 }
 .hp-gallery-item:hover img { filter: grayscale(0); transform: scale(1.07); }
 
-/* â”€â”€ CTA BOTTOM â”€â”€ */
+/*  CTA BOTTOM  */
 .hp-cta { background: var(--warm); border-top: 1px solid var(--border); }
 .hp-cta-grid {
   display: grid; grid-template-columns: 1fr; gap: 36px; align-items: center;
@@ -469,14 +469,14 @@ const CSS = `
 }
 .hp-email-row button:hover { background: var(--accent); color: var(--ink); }
 
-/* â”€â”€ misc responsive â”€â”€ */
+/*  misc responsive  */
 @media(max-width:480px){
   .hp-why-btns { flex-direction: column; }
   .hp-why-btns a { text-align: center; }
 }
 `
 
-/* â”€â”€â”€ helpers â”€â”€â”€ */
+/*  helpers  */
 function Section({ className = '', children }) {
   return (
     <section className={`hp-section ${className}`}>
@@ -488,7 +488,7 @@ function Eyebrow({ children }) {
   return <p className="hp-eyebrow">{children}</p>
 }
 
-/* â”€â”€â”€ HERO â”€â”€â”€ */
+/*  HERO  */
 function Hero({ slides }) {
   const [idx, setIdx] = useState(0)
 
@@ -517,13 +517,13 @@ function Hero({ slides }) {
               <div className="hp-hero-eyebrow">Dazzler Beauty</div>
               <h2>{s.title}</h2>
               <p>{s.text}</p>
-              <Link to="/contact" className="hp-btn">Book Now â†’</Link>
+              <Link to="/contact" className="hp-btn">Book Now </Link>
             </div>
           </div>
         ))}
       </div>
 
-      {/* dots â€” bottom-left aligned with content */}
+      {/* dots  bottom-left aligned with content */}
       <div className="hp-hero-dots">
         {slides.map((_, i) => (
           <button
@@ -538,7 +538,7 @@ function Hero({ slides }) {
   )
 }
 
-/* â”€â”€â”€ SERVICES CAROUSEL â”€â”€â”€ */
+/*  SERVICES CAROUSEL  */
 function ServicesCarousel({ services }) {
   const [pos, setPos] = useState(0)
 
@@ -589,7 +589,7 @@ function ServicesCarousel({ services }) {
   )
 }
 
-/* â”€â”€â”€ BEFORE / AFTER SLIDER â”€â”€â”€ */
+/*  BEFORE / AFTER SLIDER  */
 function BASlider() {
   const wrapRef   = useRef(null)
   const [pct, setPct] = useState(40)
@@ -618,18 +618,18 @@ function BASlider() {
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
     >
-      {/* "After" image â€” full width base */}
-      <img src="/images/home/whychooseus.jpg" alt="After treatment" />
-      <span className="hp-ba-label after">After</span>
+      {/* "After" image  full width base */}
+      <img src="/images/nails images/5.jpeg" alt="After treatment" />
+      <span className="hp-ba-label after" style={{ background: 'var(--ink)', color: 'var(--cream)', borderRadius: '4px', zIndex: 2, padding: '6px 14px' }}>After</span>
 
-      {/* "Before" image â€” clips to pct width */}
+      {/* "Before" image  clips to pct width */}
       <div className="hp-ba-resize" style={{ width: `${pct}%` }}>
         <img
-          src="/images/home/whychooseus.jpg"
+          src="/images/nails images/5.jpeg"
           alt="Before treatment"
-          style={{ width: wrapRef.current ? wrapRef.current.offsetWidth + 'px' : '100%' }}
+          style={{ width: wrapRef.current ? wrapRef.current.offsetWidth + 'px' : '100%', filter: 'grayscale(100%) contrast(85%)' }}
         />
-        <span className="hp-ba-label before">Before</span>
+        <span className="hp-ba-label before" style={{ background: 'var(--ink)', color: 'var(--cream)', borderRadius: '4px', zIndex: 2, padding: '6px 14px' }}>Before</span>
       </div>
 
       {/* Drag handle */}
@@ -644,7 +644,7 @@ function BASlider() {
   )
 }
 
-/* â”€â”€â”€ TESTIMONIALS â”€â”€â”€ */
+/*  TESTIMONIALS  */
 function Testimonials({ items }) {
   const [idx, setIdx] = useState(0)
 
@@ -660,7 +660,7 @@ function Testimonials({ items }) {
           {items.map(t => (
             <div className="hp-testi-card" key={t.name}>
               <div className="hp-testi-stars">
-                {[...Array(5)].map((_, i) => <span key={i} className="hp-testi-star">â˜…</span>)}
+                {[...Array(5)].map((_, i) => <span key={i} className="hp-testi-star"></span>)}
               </div>
               <p className="hp-testi-quote">{t.text}</p>
               <p className="hp-testi-name">{t.name}</p>
@@ -683,7 +683,7 @@ function Testimonials({ items }) {
   )
 }
 
-/* â”€â”€â”€ GALLERY (auto-scroll marquee) â”€â”€â”€ */
+/*  GALLERY (auto-scroll marquee)  */
 function Gallery({ images }) {
   const doubled = [...images, ...images]
   return (
@@ -699,34 +699,34 @@ function Gallery({ images }) {
   )
 }
 
-/* â”€â”€â”€ PAGE â”€â”€â”€ */
+/*  PAGE  */
 function HomePage() {
   const heroSlides = [
     {
       id: 'hero-1',
-      desktop: '/images/slider/1.jpg',
-      mobile:  '/images/mob/1.jpg',
+      desktop: '/images/nails images/1.jpeg',
+      mobile:  '/images/nails images/1.jpeg',
       title:   'Beauty Salon Printing and Industry',
       text:    "Dazzler Beauty in Mangalore is a haven where beauty meets precision, offering luxurious services tailored to bring out your natural radiance.",
     },
     {
       id: 'hero-2',
-      desktop: '/images/slider/2.jpg',
-      mobile:  '/images/mob/2.jpg',
+      desktop: '/images/nails images/2.jpeg',
+      mobile:  '/images/nails images/2.jpeg',
       title:   'You Will Like To Look Like Goddess Every Day',
       text:    'Our expert team is trained in the latest beauty trends and techniques, ensuring every treatment is performed with exceptional care and detail.',
     },
     {
       id: 'hero-3',
-      desktop: '/images/slider/3.jpg',
-      mobile:  '/images/mob/3.jpg',
+      desktop: '/images/nails images/3.jpeg',
+      mobile:  '/images/nails images/3.jpeg',
       title:   'Come Experience the Real Delight',
       text:    'We believe in a personalized approach to beauty, focusing on enhancing your unique features with services that are safe and effective.',
     },
     {
       id: 'hero-4',
-      desktop: '/images/slider/4.jpg',
-      mobile:  '/images/mob/4.jpg',
+      desktop: '/images/nails images/4.jpeg',
+      mobile:  '/images/nails images/4.jpeg',
       title:   'Begin Your Beauty Journey Here',
       text:    "With our passion for aesthetics and commitment to excellence, Dazzler Beauty is your trusted destination for beauty transformations.",
     },
@@ -739,11 +739,11 @@ function HomePage() {
   ]
 
   const homePortfolio = [
-    '/images/portfolio/1.jpg',  '/images/portfolio/13.jpeg', '/images/portfolio/14.jpeg',
-    '/images/portfolio/2.jpg',  '/images/portfolio/3.PNG',   '/images/portfolio/4.jpg',
-    '/images/portfolio/5.jpg',  '/images/portfolio/6.jpg',   '/images/portfolio/7.PNG',
-    '/images/portfolio/8.PNG',  '/images/portfolio/9.jpg',   '/images/portfolio/10.png',
-    '/images/portfolio/11.jpg', '/images/portfolio/12.jpg',
+    '/images/nails images/1.jpeg',  '/images/nails images/12.jpeg', '/images/nails images/13.jpeg',
+    '/images/nails images/2.jpeg',  '/images/nails images/3.jpeg',   '/images/nails images/4.jpeg',
+    '/images/nails images/5.jpeg',  '/images/nails images/6.jpeg',   '/images/nails images/7.jpeg',
+    '/images/nails images/8.jpeg',  '/images/nails images/9.jpeg',   '/images/nails images/14.jpeg',
+    '/images/nails images/15.jpeg', '/images/nails images/16.jpeg',
   ]
 
   return (
@@ -764,13 +764,13 @@ function HomePage() {
                 Dazzler Beauty in Mangalore is a haven where beauty meets
                 precision, offering luxurious services tailored to bring out your natural radiance.
               </p>
-              <div><Link to="/about" className="hp-btn hp-btn-dark">Read More â†’</Link></div>
+              <div><Link to="/about" className="hp-btn hp-btn-dark">Read More </Link></div>
             </div>
             <div className="hp-about-card">
               <div className="hp-noise" />
               <h3 style={{ position: 'relative', zIndex: 1 }}>Specialized Nail<br /><em>Artistry</em></h3>
               <p className="stat" style={{ position: 'relative', zIndex: 1 }}>1000+ Happy Customers</p>
-              <Link to="/appointment" className="hp-btn" style={{ position: 'relative', zIndex: 1 }}>Book Now â†’</Link>
+              <Link to="/appointment" className="hp-btn" style={{ position: 'relative', zIndex: 1 }}>Book Now </Link>
             </div>
           </div>
         </Section>
@@ -784,7 +784,7 @@ function HomePage() {
           </div>
           <ServicesCarousel services={services} />
           <div className="hp-srv-center">
-            <Link to="/nails" className="hp-btn hp-btn-ghost">See All Services â†’</Link>
+            <Link to="/nails" className="hp-btn hp-btn-ghost">See All Services </Link>
           </div>
         </Section>
 
@@ -798,7 +798,7 @@ function HomePage() {
                 We pride ourselves on delivering personalized beauty treatments that use
                 premium products selected to suit diverse preferences and enhance your comfort.
               </p>
-              <div><Link to="/contact" className="hp-btn">Know More â†’</Link></div>
+              <div><Link to="/contact" className="hp-btn">Know More </Link></div>
             </div>
             <BASlider />
           </div>
@@ -828,15 +828,15 @@ function HomePage() {
                 ))}
               </ul>
               <div className="hp-why-btns">
-                <Link to="/appointment" className="hp-btn">Appointment â†’</Link>
-                <Link to="/portfolio"   className="hp-btn hp-btn-dark">Portfolio â†’</Link>
+                <Link to="/appointment" className="hp-btn">Appointment </Link>
+                <Link to="/portfolio"   className="hp-btn hp-btn-dark">Portfolio </Link>
               </div>
             </div>
             <div className="hp-collage">
-              <img src="/images/home/why1.jpg" alt="Why choose us 1" />
-              <img src="/images/home/why2.jpg" alt="Why choose us 2" />
-              <img src="/images/home/why3.jpg" alt="Why choose us 3" />
-              <img src="/images/home/why4.jpg" alt="Why choose us 4" />
+              <img src="/images/nails images/7.jpeg" alt="Why choose us 1" />
+              <img src="/images/nails images/8.jpeg" alt="Why choose us 2" />
+              <img src="/images/nails images/9.jpeg" alt="Why choose us 3" />
+              <img src="/images/nails images/10.jpeg" alt="Why choose us 4" />
             </div>
           </div>
         </Section>
@@ -846,7 +846,7 @@ function HomePage() {
           <div className="hp-noise" />
           <h2 style={{ position: 'relative' }}>Let our work <em>inspire</em> you</h2>
           <p style={{ position: 'relative' }}>the beauty possibilities</p>
-          <Link to="/contact" className="hp-btn" style={{ position: 'relative' }}>Get In Touch â†’</Link>
+          <Link to="/contact" className="hp-btn" style={{ position: 'relative' }}>Get In Touch </Link>
         </section>
 
         {/* PROCESS */}
@@ -857,7 +857,7 @@ function HomePage() {
               <h2 className="hp-section-title">Quality products to ensure<br /><em>Flawless results</em></h2>
             </div>
             <div className="hp-process-img">
-              <img src="/images/home/we-process.png" alt="Our process" />
+              <img src="/images/nails images/11.jpeg" alt="Our process" />
             </div>
           </div>
         </Section>
@@ -911,3 +911,4 @@ function HomePage() {
 }
 
 export default HomePage
+

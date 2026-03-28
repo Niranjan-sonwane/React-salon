@@ -1,4 +1,7 @@
-﻿const css = `
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+
+const css = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
   .pf-root,
@@ -26,7 +29,7 @@
     padding: clamp(62px, 11vw, 132px) clamp(20px, 6vw, 88px) clamp(52px, 9vw, 106px);
     background:
       linear-gradient(120deg, rgba(26, 21, 16, 0.86), rgba(26, 21, 16, 0.56)),
-      url('/images/banner/about.jpg') center/cover no-repeat;
+      url('/images/nails images/1.jpeg') center/cover no-repeat;
   }
 
   .pf-hero::before {
@@ -101,6 +104,10 @@
     max-width: 1240px;
     margin: 0 auto;
     padding: clamp(28px, 5.5vw, 70px) clamp(16px, 4vw, 28px) clamp(60px, 7vw, 96px);
+  }
+
+  .pf-anchor {
+    scroll-margin-top: 105px;
   }
 
   .pf-intro {
@@ -257,24 +264,38 @@
 `
 
 function PortfolioPage() {
-  const items = [
-    '/images/portfolio/1.jpg',
-    '/images/portfolio/2.jpg',
-    '/images/portfolio/3.PNG',
-    '/images/portfolio/4.jpg',
-    '/images/portfolio/5.jpg',
-    '/images/portfolio/6.jpg',
-    '/images/portfolio/7.PNG',
-    '/images/portfolio/8.PNG',
-    '/images/portfolio/9.jpg',
-    '/images/portfolio/10.png',
-    '/images/portfolio/11.jpg',
-    '/images/portfolio/12.jpg',
-    '/images/inner-images/1.PNG',
-    '/images/inner-images/2.JPG',
-    '/images/inner-images/3.PNG',
-    '/images/inner-images/4.PNG',
-    '/images/inner-images/5.PNG',
+  const { hash } = useLocation()
+
+  useEffect(() => {
+    if (!hash) return
+    const id = hash.replace('#', '')
+    const el = document.getElementById(id)
+    if (el) {
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+    }
+  }, [hash])
+
+  const nailArtItems = [
+    '/images/nails images/1.jpeg',
+    '/images/nails images/2.jpeg',
+    '/images/nails images/3.jpeg',
+    '/images/nails images/4.jpeg',
+    '/images/nails images/5.jpeg',
+    '/images/nails images/6.jpeg',
+    '/images/nails images/7.jpeg',
+    '/images/nails images/8.jpeg',
+    '/images/nails images/9.jpeg',
+  ]
+
+  const jewelleryItems = [
+    '/images/nails images/10.jpeg',
+    '/images/nails images/11.jpeg',
+    '/images/nails images/12.jpeg',
+    '/images/nails images/13.jpeg',
+    '/images/nails images/14.jpeg',
+    '/images/nails images/15.jpeg',
+    '/images/nails images/16.jpeg',
+    '/images/nails images/17.jpeg',
   ]
 
   const tileClass = (index) => {
@@ -297,21 +318,41 @@ function PortfolioPage() {
           </div>
         </section>
 
-        <section className="pf-body">
+        <section className="pf-body pf-anchor" id="nail-art">
           <div className="pf-intro">
             <div>
-              <h2 className="pf-heading">Crafted Details. Beautiful Results.</h2>
+              <h2 className="pf-heading">Nail Art</h2>
               <p className="pf-copy">
-                Explore real client transformations across nails, skin, lashes, brows, and more. The gallery is optimized for every screen size so your visitors get a seamless experience on mobile, tablet, laptop, and desktop.
+                Explore detailed nail art transformations featuring clean lines, sculpted finishes, and signature designs.
               </p>
             </div>
-            <span className="pf-badge">17 Selected Works</span>
+            <span className="pf-badge">9 Selected Works</span>
           </div>
 
           <div className="pf-grid">
-            {items.map((src, index) => (
+            {nailArtItems.map((src, index) => (
               <figure className={tileClass(index)} key={src}>
                 <img src={src} alt={`Portfolio ${index + 1}`} loading="lazy" />
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        <section className="pf-body pf-anchor" id="jewellery">
+          <div className="pf-intro">
+            <div>
+              <h2 className="pf-heading">Jewellery</h2>
+              <p className="pf-copy">
+                View jewellery styling looks with elegant detailing and polished visual balance across each design.
+              </p>
+            </div>
+            <span className="pf-badge">8 Selected Works</span>
+          </div>
+
+          <div className="pf-grid">
+            {jewelleryItems.map((src, index) => (
+              <figure className={tileClass(index)} key={src}>
+                <img src={src} alt={`Jewellery ${index + 1}`} loading="lazy" />
               </figure>
             ))}
           </div>

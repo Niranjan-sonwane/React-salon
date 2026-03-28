@@ -15,7 +15,7 @@ export default function AdminLoginPage() {
   const [generalErr, setGeneralErr] = useState("")
   const [loading,    setLoading]    = useState(false)
 
-  /* â”€â”€ Live validation on blur â”€â”€ */
+  /*  Live validation on blur  */
   const handleEmailBlur = () => {
     setEmailErr(validateEmail(email) || "")
   }
@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
     setPassErr(validatePassword(password) || "")
   }
 
-  /* â”€â”€ Submit â”€â”€ */
+  /*  Submit  */
   const handleSubmit = async (e) => {
     e.preventDefault()
     setGeneralErr("")
@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="auth-shell">
-      {/* â”€â”€ Left panel â€” brand art â”€â”€ */}
+      {/*  Left panel  brand art  */}
       <div className="auth-brand">
         <div className="auth-brand__overlay" />
         <div className="auth-brand__content">
@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
         </div>
       </div>
 
-      {/* â”€â”€ Right panel â€” login form â”€â”€ */}
+      {/*  Right panel  login form  */}
       <div className="auth-form-panel">
         <Link to="/" className="auth-back-to-site">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -224,7 +224,7 @@ export default function AdminLoginPage() {
               disabled={loading}
             >
               {loading
-                ? <><span className="auth-spinner" />Verifyingâ€¦</>
+                ? <><span className="auth-spinner" />Verifying</>
                 : <>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -241,11 +241,12 @@ export default function AdminLoginPage() {
               <line x1="12" y1="8" x2="12" y2="8"/>
               <line x1="12" y1="12" x2="12" y2="16"/>
             </svg>
-            Demo â€” use <strong>admin@dazzlerbeauty.com</strong> / <strong>Admin@2026</strong>
+            Demo  use <strong>admin@dazzlerbeauty.com</strong> / <strong>Admin@2026</strong>
           </p>
         </div>
       </div>
     </div>
   )
 }
+
 

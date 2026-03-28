@@ -1,9 +1,9 @@
-import { useState, useMemo, useEffect } from "react"
+﻿import { useState, useMemo, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useBooking } from "../context/BookingContext"
 import { useAuth } from "../context/AuthContext"
 
-/* â”€â”€â”€ Helpers â”€â”€â”€ */
+/*  Helpers  */
 const pad = (v) => String(v).padStart(2, "0")
 const getDateKey = (date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
@@ -55,7 +55,7 @@ const formatSlotLabel = (time) => {
   return `${hour12.toString().padStart(2, "0")}:${minuteStr} ${meridiem}`
 }
 
-/* â”€â”€â”€ Admin Panel Views â”€â”€â”€ */
+/*  Admin Panel Views  */
 const VIEWS = ["dashboard", "calendar", "bookings"]
 
 export default function AdminPage() {
@@ -97,7 +97,7 @@ export default function AdminPage() {
     const today7  = new Date(today); today7.setDate(today7.getDate() + 7)
     const upcoming = bookings.filter(b => b.date >= todayKey)
     const thisWeek = bookings.filter(b => b.date >= todayKey && b.date <= getDateKey(today7))
-    const revenue  = bookings.length * 500  // demo: â‚¹500 avg per booking
+    const revenue  = bookings.length * 500  // demo: 500 avg per booking
     return { total: bookings.length, upcoming: upcoming.length, thisWeek: thisWeek.length, revenue }
   }, [bookings, todayKey])
 
@@ -200,10 +200,10 @@ export default function AdminPage() {
 
   return (
     <div className="admin-shell">
-      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/*  Sidebar  */}
       <aside className="admin-sidebar">
         <div className="admin-sidebar__brand">
-          <span className="admin-sidebar__logo">ðŸ’…</span>
+          <span className="admin-sidebar__logo"></span>
           <div>
             <p className="admin-sidebar__name">Dazzler Beauty</p>
             <p className="admin-sidebar__role">Admin Panel</p>
@@ -242,10 +242,10 @@ export default function AdminPage() {
         </div>
       </aside>
 
-      {/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/*  Main  */}
       <main className="admin-main">
 
-        {/* â•â•â•â• DASHBOARD â•â•â•â• */}
+        {/*  DASHBOARD  */}
         {view === "dashboard" && (
           <div className="admin-view">
             <div className="admin-view__head">
@@ -256,10 +256,10 @@ export default function AdminPage() {
             {/* Stats */}
             <div className="admin-stats-grid">
               {[
-                { label:"Total Bookings",   value:stats.total,         icon:"ðŸ“‹", color:"blue"   },
-                { label:"Upcoming",         value:stats.upcoming,      icon:"ðŸ“…", color:"purple" },
-                { label:"This Week",        value:stats.thisWeek,      icon:"ðŸ—“ï¸", color:"amber"  },
-                { label:"Est. Revenue (â‚¹)", value:`â‚¹${stats.revenue.toLocaleString()}`, icon:"ðŸ’°", color:"green" },
+                { label:"Total Bookings",   value:stats.total,         icon:"", color:"blue"   },
+                { label:"Upcoming",         value:stats.upcoming,      icon:"", color:"purple" },
+                { label:"This Week",        value:stats.thisWeek,      icon:"", color:"amber"  },
+                { label:"Est. Revenue ()", value:`${stats.revenue.toLocaleString()}`, icon:"", color:"green" },
               ].map(s => (
                 <div key={s.label} className={`admin-stat-card admin-stat-card--${s.color}`}>
                   <span className="admin-stat-card__icon">{s.icon}</span>
@@ -334,7 +334,7 @@ export default function AdminPage() {
             <div className="admin-card">
               <div className="admin-card__head">
                 <h2 className="admin-card__title">Recent Bookings</h2>
-                <button className="admin-view-all-btn" onClick={() => setView("bookings")}>View All â†’</button>
+                <button className="admin-view-all-btn" onClick={() => setView("bookings")}>View All </button>
               </div>
               {bookings.length === 0
                 ? <p className="admin-empty">No bookings yet.</p>
@@ -363,7 +363,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* â•â•â•â• CALENDAR / MANAGE DAYS â•â•â•â• */}
+        {/*  CALENDAR / MANAGE DAYS  */}
         {view === "calendar" && (
           <div className="admin-view">
             <div className="admin-view__head">
@@ -454,8 +454,8 @@ export default function AdminPage() {
 
                     <div className={`admin-day-open-badge${dayConfigForEdit.isOpen?"":" is-closed"}`}>
                       {dayConfigForEdit.isOpen
-                        ? <><span>ðŸŸ¢</span> Shop is Open</>
-                        : <><span>ðŸ”´</span> Shop is Closed</>
+                        ? <><span></span> Shop is Open</>
+                        : <><span></span> Shop is Closed</>
                       }
                     </div>
 
@@ -512,7 +512,7 @@ export default function AdminPage() {
                                       className="admin-cap-btn"
                                       onClick={() => setServiceCap(s.id, s.capacity - 1)}
                                       disabled={s.capacity <= 0}
-                                    >âˆ’</button>
+                                    ></button>
                                     <span className="admin-cap-val">{s.capacity}</span>
                                     <button
                                       className="admin-cap-btn"
@@ -532,7 +532,7 @@ export default function AdminPage() {
 
               {!selectedDay && (
                 <div className="admin-select-prompt">
-                  <span className="admin-select-prompt__icon">ðŸ“…</span>
+                  <span className="admin-select-prompt__icon"></span>
                   <p>Click any date on the calendar to customize it.</p>
                 </div>
               )}
@@ -540,7 +540,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* â•â•â•â• BOOKINGS â•â•â•â• */}
+        {/*  BOOKINGS  */}
         {view === "bookings" && (
           <div className="admin-view">
             <div className="admin-view__head">
@@ -552,7 +552,7 @@ export default function AdminPage() {
             {confirmDel && (
               <div className="appt-modal-overlay" onClick={() => setConfirmDel(null)}>
                 <div className="appt-modal" onClick={e => e.stopPropagation()}>
-                  <div className="appt-modal__icon">âš ï¸</div>
+                  <div className="appt-modal__icon"></div>
                   <h3 className="appt-modal__title">Cancel Booking?</h3>
                   <p className="appt-modal__body">This will permanently remove the booking. This action cannot be undone.</p>
                   <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
@@ -571,7 +571,7 @@ export default function AdminPage() {
               <div className="admin-card__head">
                 <input
                   className="admin-search"
-                  placeholder="Search by name, date, service, phoneâ€¦"
+                  placeholder="Search by name, date, service, phone"
                   value={bookFilter}
                   onChange={e => setBookFilter(e.target.value)}
                 />
@@ -643,4 +643,5 @@ export default function AdminPage() {
     </div>
   )
 }
+
 

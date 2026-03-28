@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useBooking } from "../context/BookingContext"
 import { fetchApi } from "../api"
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/*  helpers  */
 const pad = (v) => String(v).padStart(2, "0")
 const getDateKey = (date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
@@ -29,7 +29,7 @@ const buildCalendar = (date) => {
 
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/*  component  */
 export default function AppointmentPage() {
   const today         = new Date()
   const todayKey      = getDateKey(today)
@@ -84,7 +84,7 @@ export default function AppointmentPage() {
   const totalBooked = dayAvail ? dayAvail.services.reduce((a, s) => a + s.totalBooked, 0) : 0
   const totalCap = dayAvail ? dayAvail.services.reduce((a, s) => a + s.capacity, 0) : 0
 
-  /* â”€â”€ step 1 helpers â”€â”€ */
+  /*  step 1 helpers  */
   const handleDateClick = (key) => {
     const cfg = getDayConfig(key)
     if (!cfg.isOpen) return          // don't allow clicking closed days
@@ -94,7 +94,7 @@ export default function AppointmentPage() {
     setSubmitMsg(null)
   }
 
-  /* ── step 3 submit ── */
+  /*  step 3 submit  */
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!timeSlot) return
@@ -110,7 +110,7 @@ export default function AppointmentPage() {
     })
 
     if (result.ok) {
-      setSubmitMsg({ ok: true, text: `Confirmed! ${BASE_SERVICES.find(s=>s.id===serviceId)?.title} on ${readableDate(dateKey)} at ${timeSlot}. See you soon! 🎉` })
+      setSubmitMsg({ ok: true, text: `Confirmed! ${BASE_SERVICES.find(s=>s.id===serviceId)?.title} on ${readableDate(dateKey)} at ${timeSlot}. See you soon! ` })
       setStep(1)
       setServiceId("")
       setTimeSlot("")
@@ -128,11 +128,11 @@ export default function AppointmentPage() {
 
   return (
     <main className="appt-page">
-      {/* â”€â”€ Full-Capacity Alert Modal â”€â”€ */}
+      {/*  Full-Capacity Alert Modal  */}
       {fullAlert && (
         <div className="appt-modal-overlay" onClick={() => setFullAlert(null)}>
           <div className="appt-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="appt-modal__icon">ðŸš«</div>
+            <div className="appt-modal__icon"></div>
             <h3 className="appt-modal__title">Slot Fully Booked</h3>
             <p className="appt-modal__body">{fullAlert.message}</p>
             <button className="appt-modal__btn" onClick={() => setFullAlert(null)}>
@@ -142,8 +142,8 @@ export default function AppointmentPage() {
         </div>
       )}
 
-      {/* â”€â”€ Hero Banner â”€â”€ */}
-      <section className="appt-hero" style={{ backgroundImage: "url(/images/banner/about.jpg)" }}>
+      {/*  Hero Banner  */}
+      <section className="appt-hero" style={{ backgroundImage: "url('/images/nails images/1.jpeg')" }}>
         <div className="appt-hero__overlay" />
         <div className="appt-hero__content">
           <span className="appt-hero__eyebrow">Dazzler Beauty</span>
@@ -152,7 +152,7 @@ export default function AppointmentPage() {
           <div className="appt-hero__badges">
             <span className="appt-hero__badge">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              10:30 AM â€“ 9:00 PM
+              10:30 AM  9:00 PM
             </span>
             <span className="appt-hero__badge">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -166,19 +166,19 @@ export default function AppointmentPage() {
         </div>
       </section>
 
-      {/* â”€â”€ Body â”€â”€ */}
+      {/*  Body  */}
       <section className="appt-body">
         <div className="appt-container">
           {submitMsg?.ok && (
             <div className="appt-success-banner">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               <p>{submitMsg.text}</p>
-              <button onClick={() => setSubmitMsg(null)}>âœ•</button>
+              <button onClick={() => setSubmitMsg(null)}></button>
             </div>
           )}
 
           <div className="appt-grid">
-            {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â• LEFT PANEL â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+            {/*  LEFT PANEL  */}
             <div className="appt-left">
 
               {/* Step Nav */}
@@ -204,7 +204,7 @@ export default function AppointmentPage() {
                 ))}
               </div>
 
-              {/* â•â• STEP 1 â€” Pick a Date â•â• */}
+              {/*  STEP 1  Pick a Date  */}
               {step === 1 && (
                 <div className="appt-step-content">
                   <div className="appt-card">
@@ -287,7 +287,7 @@ export default function AppointmentPage() {
                     </div>
                     <div className="appt-booking-rows">
                       {!dayAvail || dayAvail.services.filter(s => s.totalBooked > 0).length === 0
-                        ? <p className="appt-empty-note">No bookings yet for this day. 🎉</p>
+                        ? <p className="appt-empty-note">No bookings yet for this day. </p>
                         : dayAvail.services.filter(s => s.totalBooked > 0).map(s => (
                             <div key={s.id} className="appt-brow">
                               <div className="appt-brow__left">
@@ -310,18 +310,18 @@ export default function AppointmentPage() {
                 </div>
               )}
 
-              {/* â•â• STEP 2 â€” Choose Service â•â• */}
+              {/*  STEP 2  Choose Service  */}
               {step === 2 && (
                 <div className="appt-step-content">
                   <div className="appt-card">
                     <div className="appt-card__head">
                       <div>
-                        <p className="appt-card__eyebrow">Step 2 of 3 Â· {readableDate(dateKey)}</p>
+                        <p className="appt-card__eyebrow">Step 2 of 3  {readableDate(dateKey)}</p>
                         <h2 className="appt-card__title">Choose a Service</h2>
                       </div>
                       <div className="appt-hours-pill">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        10:30 AM â€“ 9:00 PM
+                        10:30 AM  9:00 PM
                       </div>
                     </div>
 
@@ -372,13 +372,13 @@ export default function AppointmentPage() {
                 </div>
               )}
 
-              {/* â•â• STEP 3 â€” Time & Details â•â• */}
+              {/*  STEP 3  Time & Details  */}
               {step === 3 && (
                 <div className="appt-step-content">
                   <div className="appt-card">
                     <div className="appt-card__head">
                       <div>
-                        <p className="appt-card__eyebrow">Step 3 of 3 Â· {BASE_SERVICES.find(s=>s.id===serviceId)?.title}</p>
+                        <p className="appt-card__eyebrow">Step 3 of 3  {BASE_SERVICES.find(s=>s.id===serviceId)?.title}</p>
                         <h2 className="appt-card__title">Pick a Time & Confirm</h2>
                       </div>
                       <div className="appt-booking-summary-pill">{readableDate(dateKey)}</div>
@@ -491,7 +491,7 @@ export default function AppointmentPage() {
               )}
             </div>
 
-            {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â• RIGHT PANEL â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+            {/*  RIGHT PANEL  */}
             <aside className="appt-right">
               {/* Info Card */}
               <div className="appt-card appt-info-card">
@@ -501,11 +501,11 @@ export default function AppointmentPage() {
                 <div className="appt-info-hours">
                   <div className="appt-info-hour-row">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span>Mon â€“ Fri: 10:30 AM â€“ 9:00 PM</span>
+                    <span>Mon  Fri: 10:30 AM  9:00 PM</span>
                   </div>
                   <div className="appt-info-hour-row">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span>Sat â€“ Sun: 10:30 AM â€“ 8:00 PM</span>
+                    <span>Sat  Sun: 10:30 AM  8:00 PM</span>
                   </div>
                 </div>
                 <div className="appt-info-tags">
@@ -543,7 +543,7 @@ export default function AppointmentPage() {
                   {[
                     "Multiple customers can share a slot up to service capacity.",
                     "Weekend bookings need 1 day advance notice.",
-                    "Weekday slots open 30â€“60 min before.",
+                    "Weekday slots open 3060 min before.",
                     "All artists are certified & trained.",
                     "Tools sterilized before every session.",
                     "Late arrivals may shorten your session.",
@@ -562,3 +562,4 @@ export default function AppointmentPage() {
     </main>
   )
 }
+

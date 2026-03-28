@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+﻿import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { BookingProvider } from './context/BookingContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
@@ -12,7 +12,7 @@ import ServicePage from './pages/ServicePage'
 import AdminPage from './pages/AdminPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 
-/* ── Protected route: redirects to /admin-login if not authenticated ── */
+/*  Protected route: redirects to /admin-login if not authenticated  */
 function RequireAuth({ children }) {
   const { isAuthenticated } = useAuth()
   if (!isAuthenticated) {
@@ -21,7 +21,7 @@ function RequireAuth({ children }) {
   return children
 }
 
-/* ── Redirect already-logged-in users away from login page ── */
+/*  Redirect already-logged-in users away from login page  */
 function RedirectIfAuth({ children }) {
   const { isAuthenticated } = useAuth()
   if (isAuthenticated) {
@@ -36,7 +36,7 @@ function App() {
       <BookingProvider>
         <BrowserRouter>
           <Routes>
-            {/* Admin login — standalone page */}
+            {/* Admin login  standalone page */}
             <Route
               path="/admin-login"
               element={
@@ -46,7 +46,7 @@ function App() {
               }
             />
 
-            {/* Admin panel — protected, standalone full-screen */}
+            {/* Admin panel  protected, standalone full-screen */}
             <Route
               path="/admin"
               element={
@@ -88,3 +88,4 @@ function App() {
 }
 
 export default App
+
