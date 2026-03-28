@@ -403,7 +403,7 @@ function ServicePage() {
           style={{ '--sp-hero-image': `url(${service.bannerImage || '/images/banner/about.jpg'})` }}
         >
           <div className="sp-hero-inner">
-            <p className="sp-tag">Dazzler Beauty</p>
+            <p className="sp-tag">Honey Nails &amp; Academy</p>
             <h1 className="sp-title">{service.title}</h1>
             <p className="sp-sub">{service.shortDescription}</p>
           </div>

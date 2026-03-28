@@ -243,7 +243,7 @@ export default function ContactPage() {
           <div className="lal-hero-ring" aria-hidden="true" />
           <div className="lal-hero-tag">
             <span className="lal-hero-tag-dot" />
-            Dazzler Beauty
+            Honey Nails &amp; Academy
           </div>
           <h1>Let's <i>connect</i></h1>
           <p className="lal-hero-sub">

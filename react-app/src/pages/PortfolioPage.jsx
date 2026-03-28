@@ -285,9 +285,6 @@ function PortfolioPage() {
     '/images/nails images/7.jpeg',
     '/images/nails images/8.jpeg',
     '/images/nails images/9.jpeg',
-  ]
-
-  const jewelleryItems = [
     '/images/nails images/10.jpeg',
     '/images/nails images/11.jpeg',
     '/images/nails images/12.jpeg',
@@ -296,6 +293,19 @@ function PortfolioPage() {
     '/images/nails images/15.jpeg',
     '/images/nails images/16.jpeg',
     '/images/nails images/17.jpeg',
+  ]
+
+  const jewelleryItems = [
+    '/images/Jewellery/1.jpeg',
+    '/images/Jewellery/2.jpeg',
+    '/images/Jewellery/3.jpeg',
+    '/images/Jewellery/4.jpeg',
+    '/images/Jewellery/5.jpeg',
+    '/images/Jewellery/6.jpeg',
+    '/images/Jewellery/7.jpeg',
+    '/images/Jewellery/8.jpeg',
+    '/images/Jewellery/9.jpeg',
+    '/images/Jewellery/10.jpeg',
   ]
 
   const tileClass = (index) => {
@@ -310,7 +320,7 @@ function PortfolioPage() {
       <main className="pf-root page-content">
         <section className="pf-hero">
           <div className="pf-hero-inner">
-            <p className="pf-tag">Dazzler Beauty Signature Work</p>
+            <p className="pf-tag">Honey Nails & Academy Signature Work</p>
             <h1 className="pf-title">Portfolio</h1>
             <p className="pf-subtitle">
               Every frame reflects precision artistry, luxury finishes, and results designed to elevate your personal style.
@@ -326,7 +336,7 @@ function PortfolioPage() {
                 Explore detailed nail art transformations featuring clean lines, sculpted finishes, and signature designs.
               </p>
             </div>
-            <span className="pf-badge">9 Selected Works</span>
+            <span className="pf-badge">17 Selected Works</span>
           </div>
 
           <div className="pf-grid">
@@ -346,7 +356,7 @@ function PortfolioPage() {
                 View jewellery styling looks with elegant detailing and polished visual balance across each design.
               </p>
             </div>
-            <span className="pf-badge">8 Selected Works</span>
+            <span className="pf-badge">10 Selected Works</span>
           </div>
 
           <div className="pf-grid">

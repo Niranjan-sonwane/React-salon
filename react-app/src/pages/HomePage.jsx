@@ -514,7 +514,7 @@ function Hero({ slides }) {
             </div>
             <div className="hp-hero-overlay" />
             <div className="hp-hero-content">
-              <div className="hp-hero-eyebrow">Dazzler Beauty</div>
+              <div className="hp-hero-eyebrow">Honey Nails &amp; Academy</div>
               <h2>{s.title}</h2>
               <p>{s.text}</p>
               <Link to="/contact" className="hp-btn">Book Now </Link>
@@ -704,37 +704,37 @@ function HomePage() {
   const heroSlides = [
     {
       id: 'hero-1',
-      desktop: '/images/nails images/1.jpeg',
-      mobile:  '/images/nails images/1.jpeg',
+      desktop: '/images/slide show/nail image.webp',
+      mobile:  '/images/slide show/nail image.webp',
       title:   'Beauty Salon Printing and Industry',
-      text:    "Dazzler Beauty in Mangalore is a haven where beauty meets precision, offering luxurious services tailored to bring out your natural radiance.",
+      text:    "Honey Nails & Academy in Pune is a haven where beauty meets precision, offering luxurious services tailored to bring out your natural radiance.",
     },
     {
       id: 'hero-2',
-      desktop: '/images/nails images/2.jpeg',
-      mobile:  '/images/nails images/2.jpeg',
+      desktop: '/images/slide show/nail 2.jpg',
+      mobile:  '/images/slide show/nail 2.jpg',
       title:   'You Will Like To Look Like Goddess Every Day',
       text:    'Our expert team is trained in the latest beauty trends and techniques, ensuring every treatment is performed with exceptional care and detail.',
     },
     {
       id: 'hero-3',
-      desktop: '/images/nails images/3.jpeg',
-      mobile:  '/images/nails images/3.jpeg',
+      desktop: '/images/slide show/image nail 3.jpg',
+      mobile:  '/images/slide show/image nail 3.jpg',
       title:   'Come Experience the Real Delight',
       text:    'We believe in a personalized approach to beauty, focusing on enhancing your unique features with services that are safe and effective.',
     },
     {
       id: 'hero-4',
-      desktop: '/images/nails images/4.jpeg',
-      mobile:  '/images/nails images/4.jpeg',
+      desktop: '/images/slide show/nail image 4.jpg',
+      mobile:  '/images/slide show/nail image 4.jpg',
       title:   'Begin Your Beauty Journey Here',
-      text:    "With our passion for aesthetics and commitment to excellence, Dazzler Beauty is your trusted destination for beauty transformations.",
+      text:    "With our passion for aesthetics and commitment to excellence, Honey Nails & Academy is your trusted destination for beauty transformations.",
     },
   ]
 
   const testimonials = [
     { name: 'Sneha P',  text: 'Not only was the end result beautiful, but it also gave me a sense of confidence and satisfaction. The staff ensured every detail was smooth and polished.' },
-    { name: 'Ayisha',   text: "Dazzler Beauty transformed my look with unmatched care and detail. The result was natural, defined, and exactly what I wanted." },
+    { name: 'Ayisha',   text: "Honey Nails & Academy transformed my look with unmatched care and detail. The result was natural, defined, and exactly what I wanted." },
     { name: 'Kshipra',  text: 'I tried microblading with ombre shading, and the result was fantastic. The team made the whole experience comfortable and precise.' },
   ]
 
@@ -761,7 +761,7 @@ function HomePage() {
               <Eyebrow>About Us</Eyebrow>
               <h2 className="hp-section-title">Beauty is Crafted with<br /><em>Expertise</em></h2>
               <p className="hp-body-text">
-                Dazzler Beauty in Mangalore is a haven where beauty meets
+                Honey Nails &amp; Academy in Pune is a haven where beauty meets
                 precision, offering luxurious services tailored to bring out your natural radiance.
               </p>
               <div><Link to="/about" className="hp-btn hp-btn-dark">Read More </Link></div>
@@ -811,7 +811,7 @@ function HomePage() {
               <Eyebrow>Why Choose Us</Eyebrow>
               <h2 className="hp-section-title">Your Beauty Deserves<br /><em>Expert Care</em></h2>
               <p className="hp-body-text" style={{ marginTop: 14 }}>
-                Choosing Dazzler Beauty means choosing a team dedicated to
+                Choosing Honey Nails &amp; Academy means choosing a team dedicated to
                 precision, safety, and the art of beauty.
               </p>
               <ul className="hp-why-list">
@@ -885,7 +885,7 @@ function HomePage() {
               </div>
               <div>
                 <h6>Call Us</h6>
-                <p><a href="tel:+919980832431">+91 99808 32431</a></p>
+                <p><a href="tel:+918087694723">+91 80876 94723</a></p>
               </div>
             </div>
             <div className="hp-cta-connect">

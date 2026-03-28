@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
         <div className="auth-brand__overlay" />
         <div className="auth-brand__content">
           <div className="auth-brand__logo">
-            <img src="/images/DazzlerBeauty.jpeg" alt="Dazzler Beauty" />
+            <img src="/images/DazzlerBeauty.jpeg" alt="Honey Nails & Academy" />
           </div>
           <h1 className="auth-brand__tagline">
             Where Beauty<br />Meets Precision

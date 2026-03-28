@@ -219,7 +219,7 @@ function AboutPage() {
       <main className="ab-root page-content">
         <section className="ab-hero">
           <div className="ab-hero-inner">
-            <p className="ab-kicker">Dazzler Beauty</p>
+            <p className="ab-kicker">Honey Nails &amp; Academy</p>
             <h1 className="ab-hero-title">About Us</h1>
             <p className="ab-hero-sub">
               We blend modern beauty techniques with a personalized salon experience,
@@ -231,13 +231,13 @@ function AboutPage() {
         <section className="ab-wrap">
           <div className="ab-grid">
             <figure className="ab-media">
-              <img src="/images/nails images/2.jpeg" alt="About Dazzler Beauty" loading="lazy" />
+              <img src="/images/nails images/2.jpeg" alt="About Honey Nails & Academy" loading="lazy" />
             </figure>
 
             <article className="ab-content">
               <h2 className="ab-title">Where Beauty is Crafted with Expertise and Care</h2>
               <p className="ab-copy">
-                At Dazzler Beauty, every treatment is designed around your features,
+                At Honey Nails &amp; Academy, every treatment is designed around your features,
                 your comfort, and your desired finish. Our team focuses on precision,
                 hygiene, and consistent quality in every session.
               </p>
