@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 const serviceLinks = [
@@ -415,7 +415,7 @@ function Navbar() {
 
           {/* LOGO  contained within 72px bar */}
           <Link to="/" className="ll-nav-logo" aria-label="Dazzler Beauty  Home">
-            <img src="/images/header.png" alt="Dazzler Beauty" />
+            <img src="/images/DazzlerBeauty.jpeg" alt="Dazzler Beauty" />
           </Link>
 
           <button

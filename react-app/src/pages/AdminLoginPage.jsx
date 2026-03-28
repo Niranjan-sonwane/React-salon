@@ -1,4 +1,4 @@
-﻿import { useState } from "react"
+import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useAuth, validateEmail, validatePassword } from "../context/AuthContext"
 
@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
         <div className="auth-brand__overlay" />
         <div className="auth-brand__content">
           <div className="auth-brand__logo">
-            <img src="/images/header.png" alt="Dazzler Beauty" />
+            <img src="/images/DazzlerBeauty.jpeg" alt="Dazzler Beauty" />
           </div>
           <h1 className="auth-brand__tagline">
             Where Beauty<br />Meets Precision
