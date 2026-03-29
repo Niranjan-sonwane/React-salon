@@ -396,6 +396,7 @@ export default function AppointmentPage() {
                               const remaining = slotData ? slotData.remaining : 0
                               const isTaken = remaining <= 0
                               const isSel = timeSlot === slot
+                              const endTime = slotData?.endTime || slot
                               return (
                                 <button
                                   key={slot}
@@ -405,8 +406,16 @@ export default function AppointmentPage() {
                                   className={`appt-time-slot${isSel?" is-selected":""}${isTaken?" is-taken":""}`}
                                   onClick={() => !isTaken && setTimeSlot(slot)}
                                 >
-                                  {slot}
-                                  {!isTaken && <span className="appt-time-slot__rem">{remaining}</span>}
+                                  <div className="appt-time-slot__range">
+                                    <span>{formatSlotLabel(slot)}</span>
+                                    <span className="appt-time-slot__sep">-</span>
+                                    <span>{formatSlotLabel(endTime)}</span>
+                                  </div>
+                                  {isTaken ? (
+                                    <span className="appt-time-slot__booked-label">Booked</span>
+                                  ) : (
+                                    <span className="appt-time-slot__rem">{remaining} slot{remaining!==1?"s":""}</span>
+                                  )}
                                 </button>
                               )
                             })}

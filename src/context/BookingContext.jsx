@@ -11,12 +11,17 @@ export function BookingProvider({ children }) {
   })
   const [bookings, setBookings] = useState([])
   const [baseServices, setBaseServices] = useState([])
+  const [courseData, setCourseData] = useState(null)
 
   useEffect(() => {
     fetchApi("/services")
       .then((res) => {
         setBaseServices(Array.isArray(res) ? res : [])
       })
+      .catch(console.error)
+    
+    fetchApi("/course")
+      .then(setCourseData)
       .catch(console.error)
   }, [])
 
@@ -146,6 +151,43 @@ export function BookingProvider({ children }) {
     }
   }, [])
 
+  const updateServiceOverride = useCallback(async (serviceId, patch) => {
+    try {
+      await fetchApi(`/admin/services/${serviceId}`, {
+        method: "PUT",
+        body: JSON.stringify(patch),
+      })
+      // Optimistically update local baseServices
+      setBaseServices((prev) =>
+        prev.map((s) =>
+          s.id === serviceId
+            ? {
+                ...s,
+                defaultCapacity: patch.defaultCapacity > 0 ? patch.defaultCapacity : s.defaultCapacity,
+                duration: patch.duration || s.duration,
+                durationMinutes: patch.durationMinutes || s.durationMinutes,
+              }
+            : s
+        )
+      )
+    } catch (e) {
+      console.error(e)
+    }
+  }, [])
+
+  const updateCourse = useCallback(async (newCourse) => {
+    try {
+      await fetchApi("/admin/course", {
+        method: "PUT",
+        body: JSON.stringify(newCourse),
+      })
+      setCourseData(newCourse)
+    } catch (e) {
+      console.error("Failed to update course", e)
+      throw e
+    }
+  }, [])
+
   const addBooking = useCallback(async (booking) => {
     try {
       const res = await fetchApi("/bookings", {
@@ -187,6 +229,9 @@ export function BookingProvider({ children }) {
         resetDayConfig,
         cancelBooking,
         getDayAvailability,
+        updateServiceOverride,
+        course: courseData,
+        updateCourse,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useBooking } from "../context/BookingContext"
 import { useAuth } from "../context/AuthContext"
@@ -56,7 +56,7 @@ const formatSlotLabel = (time) => {
 }
 
 /*  Admin Panel Views  */
-const VIEWS = ["dashboard", "calendar", "bookings"]
+const VIEWS = ["dashboard", "calendar", "bookings", "services", "courses"]
 
 export default function AdminPage() {
   const {
@@ -70,6 +70,9 @@ export default function AdminPage() {
     resetDayConfig,
     cancelBooking,
     loadAdminData,
+    updateServiceOverride,
+    course,
+    updateCourse,
   } = useBooking()
 
   const { logout } = useAuth()
@@ -89,6 +92,17 @@ export default function AdminPage() {
   const [confirmDel,  setConfirmDel]  = useState(null)  // booking id
   const [newGlobalSlot, setNewGlobalSlot] = useState("")
   const [newDaySlot, setNewDaySlot] = useState("")
+
+  // Course editing state
+  const [editCourse, setEditCourse] = useState(null)
+  const [isSavingCourse, setIsSavingCourse] = useState(false)
+
+  useEffect(() => {
+    if (course) setEditCourse(course)
+  }, [course])
+
+  // Local state for service editing to avoid jumping while typing
+  const [editingServices, setEditingServices] = useState({})
 
   const calendar = buildCalendar(calDate)
 
@@ -193,6 +207,19 @@ export default function AdminPage() {
     setNewDaySlot("")
   }
 
+  const handleUpdateService = (s) => {
+    const patch = editingServices[s.id] || { 
+      defaultCapacity: s.defaultCapacity, 
+      duration: s.duration,
+      durationMinutes: s.durationMinutes || 60
+    }
+    updateServiceOverride(s.id, patch)
+    // Clear local edit state for this service
+    const next = { ...editingServices }
+    delete next[s.id]
+    setEditingServices(next)
+  }
+
   const daySlotPool = useMemo(() => {
     if (!dayConfigForEdit) return sortTimeSlots(shopConfig.defaultTimeSlots)
     return sortTimeSlots([...shopConfig.defaultTimeSlots, ...dayConfigForEdit.timeSlots])
@@ -215,6 +242,8 @@ export default function AdminPage() {
             { id:"dashboard", label:"Dashboard",  icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
             { id:"calendar",  label:"Manage Days", icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
             { id:"bookings",  label:"Bookings",    icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> },
+            { id:"services",  label:"Services",    icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> },
+            { id:"courses",   label:"Academy",     icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> },
           ].map(v => (
             <button
               key={v.id}
@@ -259,7 +288,7 @@ export default function AdminPage() {
                 { label:"Total Bookings",   value:stats.total,         icon:"", color:"blue"   },
                 { label:"Upcoming",         value:stats.upcoming,      icon:"", color:"purple" },
                 { label:"This Week",        value:stats.thisWeek,      icon:"", color:"amber"  },
-                { label:"Est. Revenue ()", value:`${stats.revenue.toLocaleString()}`, icon:"", color:"green" },
+                { label:"Active Services",  value:BASE_SERVICES.length, icon:"", color:"green" },
               ].map(s => (
                 <div key={s.label} className={`admin-stat-card admin-stat-card--${s.color}`}>
                   <span className="admin-stat-card__icon">{s.icon}</span>
@@ -267,6 +296,87 @@ export default function AdminPage() {
                   <span className="admin-stat-card__label">{s.label}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Course Overview Section (Dynamic) */}
+            <div className="admin-card admin-course-card">
+              <div className="admin-card__head">
+                <h2 className="admin-card__title">📌 Course Overview</h2>
+                <div style={{display:"flex",gap:"8px"}}>
+                  <span className="admin-badge admin-badge--upcoming">Live</span>
+                  <button className="admin-view-all-btn" onClick={() => setView("courses")}>Edit Course </button>
+                </div>
+              </div>
+              {course ? (
+                <div className="admin-course-details">
+                  <div className="admin-course-row">
+                    <strong>Title:</strong> <span>{course.title}</span>
+                  </div>
+                  <div className="admin-course-row">
+                    <strong>Instructor:</strong> <span>{course.instructor}</span>
+                  </div>
+                  <div className="admin-course-row">
+                    <strong>Duration:</strong> <span>{course.duration}</span>
+                  </div>
+                  
+                  <div className="admin-course-section">
+                    <h3>📚 Syllabus Highlights</h3>
+                    <p className="admin-card__sub">{course.syllabus.slice(0, 3).join(", ")} and {course.syllabus.length - 3} more...</p>
+                  </div>
+
+                  <div className="admin-course-section">
+                    <h3>💰 Pricing Tiers</h3>
+                    <div className="admin-pricing-grid">
+                      <div className="admin-pricing-item">
+                        <strong>With Kit:</strong> <span>{course.pricing.withKit}</span>
+                      </div>
+                      <div className="admin-pricing-item">
+                        <strong>No Kit:</strong> <span>{course.pricing.withoutKit}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="admin-empty">No course data found.</p>
+              )}
+            </div>
+
+            {/* Daily Occupancy Summary */}
+            <div className="admin-card">
+              <div className="admin-card__head">
+                <h2 className="admin-card__title">Daily Occupancy</h2>
+                <p className="admin-card__sub">Filled vs. Empty slots per service for today ({readableDate(todayKey)})</p>
+              </div>
+              <div className="admin-occupancy-list">
+                {BASE_SERVICES.map(s => {
+                  const dayCfg = getDayConfig(todayKey);
+                  const svcCfg = dayCfg.services.find(a => a.id === s.id);
+                  const dateMap = getDateBookings(todayKey);
+                  
+                  // Calculate total booked across all time slots for this service
+                  const booked = Object.values(dateMap[s.id] || {}).reduce((a, b) => a + b, 0);
+                  const total = svcCfg?.capacity || 0;
+                  const pct = total > 0 ? (booked / total) * 100 : 0;
+                  
+                  return (
+                    <div key={s.id} className="admin-occupancy-row">
+                      <div className="admin-occupancy-info">
+                        <span className="admin-occupancy-icon">{s.icon}</span>
+                        <div className="admin-occupancy-text">
+                          <strong>{s.title}</strong>
+                          <span>{booked} filled / {Math.max(0, total - booked)} empty</span>
+                        </div>
+                      </div>
+                      <div className="admin-occupancy-bar-wrap">
+                        <div className="admin-occupancy-bar-track">
+                          <div className="admin-occupancy-bar-fill" style={{ width: `${pct}%` }}></div>
+                        </div>
+                        <span className="admin-occupancy-pct">{Math.round(pct)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Open days global config */}
@@ -512,7 +622,7 @@ export default function AdminPage() {
                                       className="admin-cap-btn"
                                       onClick={() => setServiceCap(s.id, s.capacity - 1)}
                                       disabled={s.capacity <= 0}
-                                    ></button>
+                                    >-</button>
                                     <span className="admin-cap-val">{s.capacity}</span>
                                     <button
                                       className="admin-cap-btn"
@@ -536,6 +646,92 @@ export default function AdminPage() {
                   <p>Click any date on the calendar to customize it.</p>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/*  SERVICES MANAGEMENT  */}
+        {view === "services" && (
+          <div className="admin-view">
+            <div className="admin-view__head">
+              <h1 className="admin-view__title">Manage Services</h1>
+              <p className="admin-view__sub">Set default slot counts and duration labels for each procedure.</p>
+            </div>
+
+            <div className="admin-services-grid">
+              {BASE_SERVICES.map(s => {
+                const draft = editingServices[s.id] || {}
+                const currentCap = draft.defaultCapacity ?? s.defaultCapacity
+                const currentDur = draft.duration ?? s.duration
+                const currentMins = draft.durationMinutes ?? s.durationMinutes
+                const hasChanges = draft.defaultCapacity !== undefined || draft.duration !== undefined || draft.durationMinutes !== undefined
+
+                return (
+                  <div className="admin-card admin-service-card" key={s.id}>
+                    <div className="admin-service-card__head">
+                      <span className="admin-service-card__icon">{s.icon}</span>
+                      <h3 className="admin-service-card__title">{s.title}</h3>
+                    </div>
+
+                    <div className="admin-editor-section">
+                      <label className="admin-field-label">Default Slots (Capacity)</label>
+                      <div className="admin-cap-row__ctrl">
+                        <button
+                          className="admin-cap-btn"
+                          onClick={() => setEditingServices(prev => ({
+                            ...prev,
+                            [s.id]: { ...(prev[s.id]||{duration:s.duration}), defaultCapacity: Math.max(1, currentCap - 1) }
+                          }))}
+                        >-</button>
+                        <span className="admin-cap-val">{currentCap}</span>
+                        <button
+                          className="admin-cap-btn"
+                          onClick={() => setEditingServices(prev => ({
+                            ...prev,
+                            [s.id]: { ...(prev[s.id]||{duration:s.duration}), defaultCapacity: currentCap + 1 }
+                          }))}
+                        >+</button>
+                      </div>
+                    </div>
+
+                    <div className="admin-field">
+                      <label className="admin-field-label">Duration Label (e.g. 1.5 Hours)</label>
+                      <input
+                        className="admin-time-input"
+                        style={{ width: "100%", padding: "10px" }}
+                        value={currentDur}
+                        onChange={(e) => setEditingServices(prev => ({
+                          ...prev,
+                          [s.id]: { ...(prev[s.id]||{defaultCapacity:s.defaultCapacity, durationMinutes:s.durationMinutes}), duration: e.target.value }
+                        }))}
+                      />
+                    </div>
+
+                    <div className="admin-editor-section">
+                      <label className="admin-field-label">Duration (Minutes) - for range calculation</label>
+                      <input
+                        type="number"
+                        className="admin-time-input"
+                        style={{ width: "100%", padding: "10px" }}
+                        value={currentMins}
+                        onChange={(e) => setEditingServices(prev => ({
+                          ...prev,
+                          [s.id]: { ...(prev[s.id]||{defaultCapacity:s.defaultCapacity, duration:s.duration}), durationMinutes: parseInt(e.target.value, 10) || 0 }
+                        }))}
+                      />
+                    </div>
+
+                    <button
+                      className="admin-time-add"
+                      style={{ width: "100%", marginTop: "12px", background: hasChanges ? "var(--accent)" : "#ccc", color: hasChanges ? "var(--ink)" : "#666" }}
+                      onClick={() => handleUpdateService(s)}
+                      disabled={!hasChanges}
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -639,6 +835,146 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+        {/*  ACADEMY COURSES  */}
+        {view === "courses" && editCourse && (
+          <div className="admin-view">
+            <div className="admin-view__head">
+              <h1 className="admin-view__title">Academy Management</h1>
+              <p className="admin-view__sub">Update your training curriculum, pricing, and timing.</p>
+            </div>
+
+            <div className="admin-card">
+              <div className="admin-card__head">
+                <h2 className="admin-card__title">Course Details</h2>
+                <button 
+                  className="admin-time-add" 
+                  disabled={isSavingCourse}
+                  onClick={async () => {
+                    setIsSavingCourse(true)
+                    try {
+                      await updateCourse(editCourse)
+                      alert("Course updated successfully!")
+                    } catch (e) {
+                      alert("Failed to update course")
+                    } finally {
+                      setIsSavingCourse(false)
+                    }
+                  }}
+                >
+                  {isSavingCourse ? "Saving..." : "Save All Changes"}
+                </button>
+              </div>
+
+              <div className="admin-course-form">
+                <div className="admin-form-row">
+                  <div className="admin-field">
+                    <label>Course Title</label>
+                    <input 
+                      value={editCourse.title} 
+                      onChange={e => setEditCourse({...editCourse, title: e.target.value})}
+                    />
+                  </div>
+                  <div className="admin-field">
+                    <label>Instructor Name</label>
+                    <input 
+                      value={editCourse.instructor} 
+                      onChange={e => setEditCourse({...editCourse, instructor: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="admin-field">
+                  <label>Description</label>
+                  <textarea 
+                    rows={3}
+                    value={editCourse.description} 
+                    onChange={e => setEditCourse({...editCourse, description: e.target.value})}
+                  />
+                </div>
+
+                <div className="admin-form-row">
+                  <div className="admin-field">
+                    <label>Duration (e.g. 4 Weeks)</label>
+                    <input 
+                      value={editCourse.duration} 
+                      onChange={e => setEditCourse({...editCourse, duration: e.target.value})}
+                    />
+                  </div>
+                  <div className="admin-field">
+                    <label>Timing (e.g. Daily 2 Hours)</label>
+                    <input 
+                      value={editCourse.timing} 
+                      onChange={e => setEditCourse({...editCourse, timing: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="admin-editor-section">
+                  <h3 className="admin-editor-section__title">Syllabus</h3>
+                  <div className="admin-syllabus-edit-list">
+                    {editCourse.syllabus.map((item, idx) => (
+                      <div key={idx} className="admin-syllabus-edit-item">
+                        <input 
+                          value={item} 
+                          onChange={e => {
+                            const next = [...editCourse.syllabus]
+                            next[idx] = e.target.value
+                            setEditCourse({...editCourse, syllabus: next})
+                          }}
+                        />
+                        <button onClick={() => {
+                          const next = editCourse.syllabus.filter((_, i) => i !== idx)
+                          setEditCourse({...editCourse, syllabus: next})
+                        }}>×</button>
+                      </div>
+                    ))}
+                    <button 
+                      className="admin-add-item-btn"
+                      onClick={() => setEditCourse({...editCourse, syllabus: [...editCourse.syllabus, ""]})}
+                    >
+                      + Add Syllabus Item
+                    </button>
+                  </div>
+                </div>
+
+                <div className="admin-editor-section">
+                  <h3 className="admin-editor-section__title">Pricing</h3>
+                  <div className="admin-form-row">
+                    <div className="admin-field">
+                      <label>With Kit Pricing</label>
+                      <input 
+                        value={editCourse.pricing.withKit} 
+                        onChange={e => setEditCourse({
+                          ...editCourse, 
+                          pricing: {...editCourse.pricing, withKit: e.target.value}
+                        })}
+                      />
+                    </div>
+                    <div className="admin-field">
+                      <label>Without Kit Pricing</label>
+                      <input 
+                        value={editCourse.pricing.withoutKit} 
+                        onChange={e => setEditCourse({
+                          ...editCourse, 
+                          pricing: {...editCourse.pricing, withoutKit: e.target.value}
+                        })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="admin-field">
+                  <label>Additional Info</label>
+                  <input 
+                    value={editCourse.additional} 
+                    onChange={e => setEditCourse({...editCourse, additional: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
     </div>
   )

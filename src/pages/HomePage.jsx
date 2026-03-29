@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { services } from '../data/services'
+import SpecialtySection from '../components/SpecialtySection'
 
 /* 
    STYLES
@@ -517,7 +518,7 @@ function Hero({ slides }) {
               <div className="hp-hero-eyebrow">Honey Nails &amp; Academy</div>
               <h2>{s.title}</h2>
               <p>{s.text}</p>
-              <Link to="/contact" className="hp-btn">Book Now </Link>
+              <Link to="/appointment" className="hp-btn">Book Now </Link>
             </div>
           </div>
         ))}
@@ -704,31 +705,31 @@ function HomePage() {
   const heroSlides = [
     {
       id: 'hero-1',
-      desktop: '/images/slide show/nail image.webp',
-      mobile:  '/images/slide show/nail image.webp',
-      title:   'Beauty Salon Printing and Industry',
-      text:    "Honey Nails & Academy in Pune is a haven where beauty meets precision, offering luxurious services tailored to bring out your natural radiance.",
+      desktop: '/images/slide show/hero_1.png',
+      mobile:  '/images/slide show/hero_1.png',
+      title:   'Rose Gold Chrome Perfection',
+      text:    "Honey Nails & Academy in Pune is a haven where beauty meets precision, offering luxurious nail art services tailored to bring out your natural radiance.",
     },
     {
       id: 'hero-2',
-      desktop: '/images/slide show/nail 2.jpg',
-      mobile:  '/images/slide show/nail 2.jpg',
-      title:   'You Will Like To Look Like Goddess Every Day',
-      text:    'Our expert team is trained in the latest beauty trends and techniques, ensuring every treatment is performed with exceptional care and detail.',
+      desktop: '/images/slide show/hero_2.png',
+      mobile:  '/images/slide show/hero_2.png',
+      title:   'You Will Look Like a Goddess Every Day',
+      text:    'Our expert team is trained in the latest beauty trends and techniques, ensuring every treatment is performed with exceptional care and stunning detail.',
     },
     {
       id: 'hero-3',
-      desktop: '/images/slide show/image nail 3.jpg',
-      mobile:  '/images/slide show/image nail 3.jpg',
-      title:   'Come Experience the Real Delight',
-      text:    'We believe in a personalized approach to beauty, focusing on enhancing your unique features with services that are safe and effective.',
+      desktop: '/images/slide show/hero_3.png',
+      mobile:  '/images/slide show/hero_3.png',
+      title:   'Art Beyond Imagination',
+      text:    'We believe in a personalized approach to beauty, crafting unique nail art that enhances your style with premium products and safe, precise techniques.',
     },
     {
       id: 'hero-4',
-      desktop: '/images/slide show/nail image 4.jpg',
-      mobile:  '/images/slide show/nail image 4.jpg',
+      desktop: '/images/slide show/hero_4.png',
+      mobile:  '/images/slide show/hero_4.png',
       title:   'Begin Your Beauty Journey Here',
-      text:    "With our passion for aesthetics and commitment to excellence, Honey Nails & Academy is your trusted destination for beauty transformations.",
+      text:    "With our passion for aesthetics and commitment to excellence, Honey Nails & Academy is your trusted destination for transformative nail art experiences.",
     },
   ]
 
@@ -788,21 +789,8 @@ function HomePage() {
           </div>
         </Section>
 
-        {/* BEFORE / AFTER */}
-        <Section className="hp-ba">
-          <div className="hp-ba-grid">
-            <div className="hp-ba-text">
-              <Eyebrow>Our Speciality</Eyebrow>
-              <h2 className="hp-section-title">Unveil Your Beauty with<br /><em>Flawless Precision</em></h2>
-              <p className="hp-body-text">
-                We pride ourselves on delivering personalized beauty treatments that use
-                premium products selected to suit diverse preferences and enhance your comfort.
-              </p>
-              <div><Link to="/contact" className="hp-btn">Know More </Link></div>
-            </div>
-            <BASlider />
-          </div>
-        </Section>
+        {/* SPECIALTY SECTION (Before/After) */}
+        <SpecialtySection />
 
         {/* WHY US */}
         <Section className="hp-why">

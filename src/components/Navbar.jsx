@@ -243,6 +243,30 @@ function Navbar() {
         .ll-nav-pill:hover { background: #c8a96e; color: #1a1510 !important; }
         .ll-nav-pill.active { background: #c8a96e; color: #1a1510 !important; }
 
+        /*  WHATSAPP BUTTON  */
+        .ll-nav-whatsapp {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #25d366;
+          color: #fff !important;
+          padding: 10px 18px;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          text-decoration: none;
+          transition: transform 0.2s, background 0.2s;
+          line-height: 1;
+        }
+        .ll-nav-whatsapp:hover {
+          background: #128c7e;
+          transform: translateY(-1px);
+        }
+        .ll-nav-whatsapp svg {
+          stroke-width: 2.5;
+        }
+
         /*  ADMIN BTN  single circle, no duplicate  */
         .ll-nav-admin {
           width: 34px; height: 34px;
@@ -436,6 +460,7 @@ function Navbar() {
           <nav className="ll-nav-right" aria-label="Primary right navigation">
             <NavLink to="/appointment" className={({ isActive }) => `ll-nav-link${isActive ? ' active' : ''}`}>Appointment</NavLink>
             <NavLink to="/portfolio"   className={({ isActive }) => `ll-nav-link${isActive ? ' active' : ''}`}>Portfolio</NavLink>
+            <NavLink to="/courses"     className={({ isActive }) => `ll-nav-link${isActive ? ' active' : ''}`}>Courses</NavLink>
             <div className="ll-nav-services">
               <button type="button" className="ll-nav-service-btn" aria-haspopup="true">
                 Gallery
@@ -457,6 +482,12 @@ function Navbar() {
               </div>
             </div>
             <NavLink to="/contact"     className={({ isActive }) => `ll-nav-pill${isActive ? ' active' : ''}`}>Contact</NavLink>
+            <a href="https://wa.me/918087694723" target="_blank" rel="noopener noreferrer" className="ll-nav-whatsapp">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L22 2l-2.1 4.7a8.38 8.38 0 0 1 .9 3.8z"/>
+              </svg>
+              Chat
+            </a>
             {/* One admin button  no duplicate */}
             <button
               type="button"
@@ -515,6 +546,7 @@ function Navbar() {
 
               <NavLink to="/appointment" className={({ isActive }) => `ll-nav-mobile-link${isActive ? ' active' : ''}`} onClick={closeMenu}>Appointment</NavLink>
               <NavLink to="/portfolio"   className={({ isActive }) => `ll-nav-mobile-link${isActive ? ' active' : ''}`} onClick={closeMenu}>Portfolio</NavLink>
+              <NavLink to="/courses"     className={({ isActive }) => `ll-nav-mobile-link${isActive ? ' active' : ''}`} onClick={closeMenu}>Courses</NavLink>
 
               <button
                 type="button"
@@ -547,6 +579,19 @@ function Navbar() {
               )}
 
               <NavLink to="/contact"     className={({ isActive }) => `ll-nav-mobile-link${isActive ? ' active' : ''}`} onClick={closeMenu}>Contact</NavLink>
+              
+              <a 
+                href="https://wa.me/918087694723" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="ll-nav-mobile-link"
+                style={{ background: '#25d366', color: '#fff', border: 'none', marginTop: '12px', justifyContent: 'center', gap: '8px' }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L22 2l-2.1 4.7a8.38 8.38 0 0 1 .9 3.8z"/>
+                </svg>
+                WhatsApp Chat
+              </a>
             </div>
           </div>
         )}

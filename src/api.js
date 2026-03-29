@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://backend-for-salaon.onrender.com/api"
+const API_BASE_URL = "http://localhost:5000/api"
 
 /**
  * Standard fetch helper that includes authorization headers for admin requests
@@ -6,7 +6,7 @@ const API_BASE_URL = "https://backend-for-salaon.onrender.com/api"
  */
 export async function fetchApi(endpoint, options = {}) {
   const token = localStorage.getItem("leela_admin_token")
-  
+
   const headers = {
     "Content-Type": "application/json",
     ...options.headers,
@@ -36,17 +36,17 @@ export async function fetchApi(endpoint, options = {}) {
       localStorage.removeItem("leela_admin_token")
       sessionStorage.removeItem("leela_admin_auth") // legacy cleanup
     }
-    
+
     // Fallback error format if backend doesn't send defined error shapes
-    const errorMsg = typeof data === 'object' && data.reason 
-      ? data.reason 
-      : (typeof data === 'object' && data.message 
-          ? data.message 
-          : "An unexpected error occurred.")
-          
+    const errorMsg = typeof data === 'object' && data.reason
+      ? data.reason
+      : (typeof data === 'object' && data.message
+        ? data.message
+        : "An unexpected error occurred.")
+
     const errorCode = typeof data === 'object' && data.code ? data.code : "SERVER_ERROR"
     const errorField = typeof data === 'object' && data.field ? data.field : "general"
-    
+
     throw { status: response.status, message: errorMsg, code: errorCode, field: errorField }
   }
 

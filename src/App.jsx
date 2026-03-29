@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { BookingProvider } from './context/BookingContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
@@ -11,6 +11,7 @@ import PortfolioPage from './pages/PortfolioPage'
 import ServicePage from './pages/ServicePage'
 import AdminPage from './pages/AdminPage'
 import AdminLoginPage from './pages/AdminLoginPage'
+import CoursePage from './pages/CoursePage'
 
 /*  Protected route: redirects to /admin-login if not authenticated  */
 function RequireAuth({ children }) {
@@ -63,6 +64,7 @@ function App() {
               <Route path="appointment" element={<AppointmentPage />} />
               <Route path="contact" element={<ContactPage />} />
               <Route path="portfolio" element={<PortfolioPage />} />
+              <Route path="courses" element={<CoursePage />} />
               <Route path="index.html" element={<Navigate to="/" replace />} />
               <Route path="about.html" element={<Navigate to="/about" replace />} />
               <Route path="appointment.html" element={<Navigate to="/appointment" replace />} />
@@ -88,4 +90,3 @@ function App() {
 }
 
 export default App
-
