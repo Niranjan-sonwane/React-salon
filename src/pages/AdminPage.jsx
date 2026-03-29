@@ -11,7 +11,7 @@ const getDateKey = (date) =>
 const readableDate = (key) => {
   if (!key) return ""
   const [y, m, d] = key.split("-")
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+  return new Date(y, m - 1, d).toLocaleDateString("en-IN", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   })
 }
@@ -49,10 +49,7 @@ const formatSlotLabel = (time) => {
   const normalized = normalizeTime(time)
   if (!normalized) return time
   const [hourStr, minuteStr] = normalized.split(":")
-  const hour24 = Number(hourStr)
-  const meridiem = hour24 >= 12 ? "PM" : "AM"
-  const hour12 = hour24 % 12 || 12
-  return `${hour12.toString().padStart(2, "0")}:${minuteStr} ${meridiem}`
+  return `${hourStr.padStart(2, "0")}:${minuteStr}`
 }
 
 /*  Admin Panel Views  */
@@ -91,7 +88,15 @@ export default function AdminPage() {
   const [bookFilter,  setBookFilter]  = useState("")
   const [confirmDel,  setConfirmDel]  = useState(null)  // booking id
   const [newGlobalSlot, setNewGlobalSlot] = useState("")
-  const [newDaySlot, setNewDaySlot] = useState("")
+  const [newDayStart, setNewDayStart] = useState("")
+  const [newDayEnd, setNewDayEnd] = useState("")
+  const [selectedDayService, setSelectedDayService] = useState("") // "" means global day slots
+
+  // Quick Add Time Slots directly from Dashboard
+  const [quickAddDate, setQuickAddDate] = useState(todayKey)
+  const [quickAddService, setQuickAddService] = useState("")
+  const [quickAddStart, setQuickAddStart] = useState("")
+  const [quickAddEnd, setQuickAddEnd] = useState("")
 
   // Course editing state
   const [editCourse, setEditCourse] = useState(null)
@@ -150,10 +155,20 @@ export default function AdminPage() {
   const toggleTime = (time) => {
     if (!selectedDay) return
     const cfg = getDayConfig(selectedDay)
-    const slots = cfg.timeSlots.includes(time)
-      ? cfg.timeSlots.filter(t => t !== time)
-      : sortTimeSlots([...cfg.timeSlots, time])
-    setDayConfig(selectedDay, { timeSlots: slots })
+    
+    if (selectedDayService) {
+      const slots = cfg.serviceTimeSlots?.[selectedDayService] || []
+      const updated = slots.includes(time)
+        ? slots.filter(t => t !== time)
+        : sortTimeSlots([...slots, time])
+      const newMap = { ...(cfg.serviceTimeSlots || {}), [selectedDayService]: updated }
+      setDayConfig(selectedDay, { serviceTimeSlots: newMap })
+    } else {
+      const slots = cfg.timeSlots.includes(time)
+        ? cfg.timeSlots.filter(t => t !== time)
+        : sortTimeSlots([...cfg.timeSlots, time])
+      setDayConfig(selectedDay, { timeSlots: slots })
+    }
   }
 
   const setServiceCap = (serviceId, cap) => {
@@ -198,13 +213,134 @@ export default function AdminPage() {
     }))
   }
 
-  const addDayTime = () => {
-    if (!selectedDay) return
-    const slot = normalizeTime(newDaySlot)
-    if (!slot) return
+  const handleQuickAddSlots = () => {
+    if (!quickAddDate) {
+      alert("Please select a date.")
+      return
+    }
+    if (!quickAddService) {
+      alert("Please select a service.")
+      return
+    }
+    
+    const start = normalizeTime(quickAddStart)
+    const end = normalizeTime(quickAddEnd)
+    if (!start || !end) {
+      alert("Please enter both Start and End times.")
+      return
+    }
+
+    let duration = 60
+    const sRef = BASE_SERVICES.find(s => s.id === quickAddService)
+    if (sRef) {
+      if (sRef.durationMinutes) duration = Number(sRef.durationMinutes) || 60
+      else if (sRef.duration) duration = parseInt(sRef.duration, 10) || 60
+    }
+
+    let current = new Date(`1970-01-01T${start}:00Z`)
+    const endTime = new Date(`1970-01-01T${end}:00Z`)
+    
+    if (current >= endTime) {
+      alert("End Time must be after the Start Time.")
+      return
+    }
+    
+    let generated = []
+    while (current < endTime) {
+      const h = current.getUTCHours().toString().padStart(2, '0')
+      const m = current.getUTCMinutes().toString().padStart(2, '0')
+      generated.push(`${h}:${m}`)
+      current.setUTCMinutes(current.getUTCMinutes() + duration)
+    }
+
+    if (generated.length === 0) {
+      alert("No slots could be generated within that time frame.")
+      return
+    }
+
+    const cfg = getDayConfig(quickAddDate)
+    const slots = cfg.serviceTimeSlots?.[quickAddService] || []
+    const combined = sortTimeSlots([...slots, ...generated])
+    const newMap = { ...(cfg.serviceTimeSlots || {}), [quickAddService]: combined }
+    
+    const updates = { serviceTimeSlots: newMap }
+    if (!cfg.isOpen) {
+      updates.open = true
+    }
+    setDayConfig(quickAddDate, updates)
+
+    alert(`Successfully generated ${generated.length} slots for ${readableDate(quickAddDate)}!`)
+    
+    setQuickAddStart("")
+    setQuickAddEnd("")
+  }
+
+  const generateDaySlots = () => {
+    if (!selectedDay) {
+      alert("Please select a date from the calendar first.")
+      return
+    }
+    const start = normalizeTime(newDayStart)
+    const end = normalizeTime(newDayEnd)
+    if (!start || !end) {
+      alert("Please enter both a valid Start Time and End Time.")
+      return
+    }
+    
+    // Find duration
+    let duration = 60 // default 60
+    if (selectedDayService) {
+      const sRef = BASE_SERVICES.find(s => s.id === selectedDayService)
+      if (sRef) {
+        if (sRef.durationMinutes) {
+          duration = Number(sRef.durationMinutes) || 60
+        } else if (sRef.duration) {
+          // Fallback to parse "40 min" string
+          duration = parseInt(sRef.duration, 10) || 60
+        }
+      }
+    }
+
+    // Generate slots
+    let current = new Date(`1970-01-01T${start}:00Z`)
+    const endTime = new Date(`1970-01-01T${end}:00Z`)
+    
+    if (current >= endTime) {
+      alert("End Time must be after the Start Time.")
+      return
+    }
+    
+    let generated = []
+    while (current < endTime) {
+      const h = current.getUTCHours().toString().padStart(2, '0')
+      const m = current.getUTCMinutes().toString().padStart(2, '0')
+      generated.push(`${h}:${m}`)
+      current.setUTCMinutes(current.getUTCMinutes() + duration)
+    }
+
+    if (generated.length === 0) {
+      alert("No slots could be generated within that time frame.")
+      return
+    }
+
     const cfg = getDayConfig(selectedDay)
-    setDayConfig(selectedDay, { timeSlots: sortTimeSlots([...cfg.timeSlots, slot]) })
-    setNewDaySlot("")
+
+    const updates = {}
+    if (selectedDayService) {
+      const slots = cfg.serviceTimeSlots?.[selectedDayService] || []
+      const combined = sortTimeSlots([...slots, ...generated])
+      updates.serviceTimeSlots = { ...(cfg.serviceTimeSlots || {}), [selectedDayService]: combined }
+    } else {
+      updates.timeSlots = sortTimeSlots([...cfg.timeSlots, ...generated])
+    }
+
+    if (!cfg.isOpen) {
+      updates.open = true
+    }
+    setDayConfig(selectedDay, updates)
+
+    setNewDayStart("")
+    setNewDayEnd("")
   }
 
   const handleUpdateService = (s) => {
@@ -222,8 +358,15 @@ export default function AdminPage() {
 
   const daySlotPool = useMemo(() => {
     if (!dayConfigForEdit) return sortTimeSlots(shopConfig.defaultTimeSlots)
-    return sortTimeSlots([...shopConfig.defaultTimeSlots, ...dayConfigForEdit.timeSlots])
-  }, [shopConfig.defaultTimeSlots, dayConfigForEdit])
+    
+    let specific = []
+    if (selectedDayService) {
+      specific = dayConfigForEdit.serviceTimeSlots?.[selectedDayService] || []
+    } else {
+      specific = dayConfigForEdit.timeSlots || []
+    }
+    return sortTimeSlots([...shopConfig.defaultTimeSlots, ...specific])
+  }, [shopConfig.defaultTimeSlots, dayConfigForEdit, selectedDayService])
 
   return (
     <div className="admin-shell">
@@ -399,14 +542,14 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Default time slots */}
+            {/* Global Pre-Existing Slots */}
             <div className="admin-card">
               <div className="admin-card__head">
-                <h2 className="admin-card__title">Default Time Slots</h2>
-                <p className="admin-card__sub">Create slots dynamically. These apply to all dates unless overridden per day.</p>
+                <h2 className="admin-card__title">Global Pre-Existing Slots</h2>
+                <p className="admin-card__sub">The following slots are standard default slots (or were added globally) and apply to all days without overrides.</p>
               </div>
 
-              <div className="admin-time-builder">
+              <div className="admin-time-builder" style={{ padding: 0, border: "none" }}>
                 <input
                   type="time"
                   className="admin-time-input"
@@ -416,7 +559,7 @@ export default function AdminPage() {
                 <button type="button" className="admin-time-add" onClick={addGlobalTime}>Add Slot</button>
               </div>
 
-              <div className="admin-time-toggles">
+              <div className="admin-time-toggles" style={{ marginTop: "12px" }}>
                 {sortTimeSlots(shopConfig.defaultTimeSlots).map((t) => (
                   <div key={t} className="admin-time-chip">
                     <button
@@ -491,7 +634,7 @@ export default function AdminPage() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                   </button>
                   <strong className="admin-cal-month">
-                    {calDate.toLocaleDateString("en-US", { month:"long", year:"numeric" })}
+                    {calDate.toLocaleDateString("en-IN", { month:"long", year:"numeric" })}
                   </strong>
                   <button className="admin-cal-arrow" onClick={() => {
                     const d = new Date(calDate); d.setMonth(d.getMonth()+1); setCalDate(d)
@@ -576,27 +719,64 @@ export default function AdminPage() {
                           <h3 className="admin-editor-section__title">Time Slots for This Day</h3>
                           <p className="admin-editor-section__sub">Add or toggle slots for this specific date.</p>
 
-                          <div className="admin-time-builder">
-                            <input
-                              type="time"
-                              className="admin-time-input"
-                              value={newDaySlot}
-                              onChange={(e) => setNewDaySlot(e.target.value)}
-                            />
-                            <button type="button" className="admin-time-add" onClick={addDayTime}>Add Slot</button>
+                          {/* Service Filter dropdown */}
+                          <div style={{ marginBottom: "12px" }}>
+                            <select 
+                              className="admin-time-input" 
+                              style={{ width: "100%", maxWidth: "300px", padding: "8px" }}
+                              value={selectedDayService}
+                              onChange={e => setSelectedDayService(e.target.value)}
+                            >
+                              <option value="">Global (All Services)</option>
+                              {BASE_SERVICES.map(s => (
+                                <option key={s.id} value={s.id}>{s.title}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="admin-time-builder" style={{ marginTop: "0", display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "8px" }}>
+                            <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
+                              <label style={{fontSize: "10px", fontWeight: "600", color: "var(--c-text-muted)", textTransform: "uppercase"}}>Start Time</label>
+                              <input
+                                type="time"
+                                className="admin-time-input"
+                                value={newDayStart}
+                                onChange={(e) => setNewDayStart(e.target.value)}
+                              />
+                            </div>
+                            <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
+                              <label style={{fontSize: "10px", fontWeight: "600", color: "var(--c-text-muted)", textTransform: "uppercase"}}>End Time</label>
+                              <input
+                                type="time"
+                                className="admin-time-input"
+                                value={newDayEnd}
+                                onChange={(e) => setNewDayEnd(e.target.value)}
+                              />
+                            </div>
+                            <button type="button" className="admin-time-add" onClick={generateDaySlots} style={{alignSelf: "end", height: "38px"}}>
+                              Generate
+                            </button>
                           </div>
 
                           <div className="admin-time-toggles">
-                            {daySlotPool.map(t => (
-                              <button
-                                key={t}
-                                type="button"
-                                className={`admin-time-toggle${dayConfigForEdit.timeSlots.includes(t)?" is-on":""}`}
-                                onClick={() => toggleTime(t)}
-                              >
-                                {formatSlotLabel(t)}
-                              </button>
-                            ))}
+                            {daySlotPool.map(t => {
+                              let isActive = false
+                              if (selectedDayService) {
+                                isActive = (dayConfigForEdit.serviceTimeSlots?.[selectedDayService] || []).includes(t)
+                              } else {
+                                isActive = dayConfigForEdit.timeSlots.includes(t)
+                              }
+                              return (
+                                <button
+                                  key={t}
+                                  type="button"
+                                  className={`admin-time-toggle${isActive ? " is-on" : ""}`}
+                                  onClick={() => toggleTime(t)}
+                                >
+                                  {formatSlotLabel(t)}
+                                </button>
+                              )
+                            })}
                           </div>
                         </div>
 

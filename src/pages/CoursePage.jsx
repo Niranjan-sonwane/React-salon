@@ -93,7 +93,7 @@ export default function CoursePage() {
                   </div>
                 </div>
                 <div className="course-cta">
-                  <a href="/contact" className="course-cta-btn">Enquire Now</a>
+                  <a href="https://wa.me/918087694723" target="_blank" rel="noopener noreferrer" className="course-cta-btn">Enquire Now</a>
                 </div>
               </div>
             </div>

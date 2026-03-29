@@ -50,13 +50,14 @@ export function BookingProvider({ children }) {
           : (shopConfig.openDays || []).includes(dayOfWeek)
 
       const timeSlots = override.timeSlots ?? (shopConfig.defaultTimeSlots || [])
+      const serviceTimeSlots = override.serviceTimeSlots || {}
 
       const services = baseServices.map((s) => ({
         ...s,
         capacity: override.services?.[s.id] ?? s.defaultCapacity,
       }))
 
-      return { dateKey, isOpen, timeSlots, services }
+      return { dateKey, isOpen, timeSlots, serviceTimeSlots, services }
     },
     [shopConfig, baseServices],
   )
@@ -113,21 +114,30 @@ export function BookingProvider({ children }) {
 
   const setDayConfig = useCallback(async (dateKey, config) => {
     try {
+      const normalizedConfig = { ...config }
+      if ("isOpen" in normalizedConfig) {
+        normalizedConfig.open = normalizedConfig.isOpen
+        delete normalizedConfig.isOpen
+      }
+
+      const existing = shopConfig.dayConfigs?.[dateKey] || {}
+      const mergedConfig = { ...existing, ...normalizedConfig }
+
       await fetchApi(`/admin/config/day/${dateKey}`, {
         method: "PUT",
-        body: JSON.stringify(config),
+        body: JSON.stringify(mergedConfig),
       })
       setShopConfig((prev) => ({
         ...prev,
         dayConfigs: {
           ...prev.dayConfigs,
-          [dateKey]: { ...(prev.dayConfigs[dateKey] || {}), ...config },
+          [dateKey]: { ...(prev.dayConfigs[dateKey] || {}), ...normalizedConfig },
         },
       }))
     } catch (e) {
       console.error(e)
     }
-  }, [])
+  }, [shopConfig])
 
   const resetDayConfig = useCallback(async (dateKey) => {
     try {
@@ -209,7 +219,8 @@ export function BookingProvider({ children }) {
     try {
       return await fetchApi(`/availability?date=${dateKey}`)
     } catch (e) {
-      return null
+      console.error("Availability fetch failed:", e)
+      return { _error: true, message: e.message || "Could not connect to server" }
     }
   }, [])
 

@@ -1,4 +1,4 @@
-﻿import { Link, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { services } from '../data/services'
 
 const css = `
@@ -439,9 +439,9 @@ function ServicePage() {
                   <Link to="/appointment" className="sp-btn sp-btn-primary">
                     Book Appointment
                   </Link>
-                  <Link to="/contact" className="sp-btn sp-btn-ghost">
+                  <a href="https://wa.me/918087694723" target="_blank" rel="noopener noreferrer" className="sp-btn sp-btn-ghost">
                     Talk to Us
-                  </Link>
+                  </a>
                 </div>
               </div>
             </div>

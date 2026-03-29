@@ -10,9 +10,15 @@ const getDateKey = (date) =>
 const readableDate = (key) => {
   if (!key) return ""
   const [y, m, d] = key.split("-")
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+  return new Date(y, m - 1, d).toLocaleDateString("en-IN", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   })
+}
+
+const formatSlotLabel = (timeStr) => {
+  if (!timeStr) return ""
+  const [h, m] = timeStr.split(":")
+  return `${pad(h)}:${m}`
 }
 
 const buildCalendar = (date) => {
@@ -152,7 +158,7 @@ export default function AppointmentPage() {
           <div className="appt-hero__badges">
             <span className="appt-hero__badge">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              10:30 AM  9:00 PM
+              10:30 - 21:00
             </span>
             <span className="appt-hero__badge">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -214,7 +220,7 @@ export default function AppointmentPage() {
                         <h2 className="appt-card__title">Select a Date</h2>
                       </div>
                       <div className="appt-month-badge">
-                        {today.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                        {today.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
                       </div>
                     </div>
 
@@ -257,14 +263,40 @@ export default function AppointmentPage() {
                       <span><i className="appt-dot appt-dot--closed" /> Closed</span>
                     </div>
 
-                    <button
-                      className="appt-next-btn"
-                      type="button"
-                      onClick={() => setStep(2)}
-                      disabled={isLoadingAvail || !dayAvail || !dayAvail.isOpen}
-                    >
-                      {isLoadingAvail ? "Loading..." : "Continue"}  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                    </button>
+                    {(() => {
+                      const hasSlots = dayAvail && dayAvail.timeSlots && dayAvail.timeSlots.length > 0;
+                      const isDisabled = isLoadingAvail || !dayAvail || !dayAvail.isOpen || !hasSlots || dayAvail._error;
+                      
+                      let btnText = "Continue";
+                      if (isLoadingAvail) btnText = "Loading...";
+                      else if (dayAvail?._error) btnText = "Server Error";
+                      else if (dayAvail?.isOpen && !hasSlots) btnText = "No Slots Added";
+
+                      return (
+                        <>
+                          <button
+                            className="appt-next-btn"
+                            type="button"
+                            onClick={() => setStep(2)}
+                            disabled={isDisabled}
+                          >
+                            {btnText} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                          </button>
+                          
+                          {dayAvail?._error && (
+                            <p style={{ color: "#ef4444", fontSize: "12px", marginTop: "12px", textAlign: "center", fontWeight: "600" }}>
+                              Failed to connect to backend server.
+                            </p>
+                          )}
+                          
+                          {dayAvail?.isOpen && !hasSlots && !isLoadingAvail && !dayAvail._error && (
+                            <p style={{ color: "var(--c-text-muted)", fontSize: "12px", marginTop: "12px", textAlign: "center", fontWeight: "500" }}>
+                              No time slots are available for bookings on this day.
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
 
                   {/* Day Summary Card */}
@@ -321,7 +353,7 @@ export default function AppointmentPage() {
                       </div>
                       <div className="appt-hours-pill">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        10:30 AM  9:00 PM
+                        10:30 - 21:00
                       </div>
                     </div>
 
@@ -378,7 +410,7 @@ export default function AppointmentPage() {
                   <div className="appt-card">
                     <div className="appt-card__head">
                       <div>
-                        <p className="appt-card__eyebrow">Step 3 of 3  {BASE_SERVICES.find(s=>s.id===serviceId)?.title}</p>
+                        <p className="appt-card__eyebrow">Step 3 of 3  • {BASE_SERVICES?.find(s=>s.id===serviceId)?.title || "Service selection"}</p>
                         <h2 className="appt-card__title">Pick a Time & Confirm</h2>
                       </div>
                       <div className="appt-booking-summary-pill">{readableDate(dateKey)}</div>
@@ -387,16 +419,16 @@ export default function AppointmentPage() {
                     {/* Time Slots */}
                     <div className="appt-time-section">
                       <p className="appt-section-label">Available Time Slots</p>
-                      {!dayAvail || dayAvail.timeSlots.length === 0
-                        ? <p className="appt-empty-note">No time slots configured by admin for this day.</p>
+                      {!slotAvail || slotAvail.length === 0
+                        ? <p className="appt-empty-note">No time slots available for the selected duration/day.</p>
                         : (
                           <div className="appt-time-grid">
-                            {dayAvail.timeSlots.map((slot) => {
-                              const slotData = slotAvail.find(sa => sa.time === slot)
-                              const remaining = slotData ? slotData.remaining : 0
+                            {slotAvail.map((slotData) => {
+                              const slot = slotData.time
+                              const remaining = slotData.remaining
                               const isTaken = remaining <= 0
                               const isSel = timeSlot === slot
-                              const endTime = slotData?.endTime || slot
+                              const endTime = slotData.endTime || slot
                               return (
                                 <button
                                   key={slot}
@@ -510,11 +542,11 @@ export default function AppointmentPage() {
                 <div className="appt-info-hours">
                   <div className="appt-info-hour-row">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span>Mon  Fri: 10:30 AM  9:00 PM</span>
+                    <span>Mon  Fri: 10:30 - 21:00</span>
                   </div>
                   <div className="appt-info-hour-row">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span>Sat  Sun: 10:30 AM  8:00 PM</span>
+                    <span>Sat  Sun: 10:30 - 20:00</span>
                   </div>
                 </div>
                 <div className="appt-info-tags">
