@@ -475,6 +475,124 @@ const CSS = `
   .hp-why-btns { flex-direction: column; }
   .hp-why-btns a { text-align: center; }
 }
+
+/*  BRAND IDENTITY STRIP  */
+.hp-brand {
+  background: var(--cream);
+  padding: clamp(44px, 7vw, 80px) clamp(24px, 6vw, 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.hp-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 90% at 50% 50%, rgba(200,169,110,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hp-brand-divider {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 640px;
+}
+.hp-brand-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200,169,110,.45));
+}
+.hp-brand-divider-line.right {
+  background: linear-gradient(to left, transparent, rgba(200,169,110,.45));
+}
+.hp-brand-divider-diamond {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  opacity: .7;
+}
+.hp-brand-logo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hp-brand-logo-wrap::before,
+.hp-brand-logo-wrap::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(200,169,110,.12);
+  pointer-events: none;
+}
+.hp-brand-logo-wrap::before {
+  width: clamp(170px, 22vw, 240px);
+  height: clamp(170px, 22vw, 240px);
+}
+.hp-brand-logo-wrap::after {
+  width: clamp(210px, 28vw, 300px);
+  height: clamp(210px, 28vw, 300px);
+}
+.hp-brand-logo {
+  width: clamp(120px, 16vw, 190px);
+  height: auto;
+  display: block;
+  mix-blend-mode: multiply;
+  filter: contrast(1.05) brightness(1.06);
+  position: relative;
+  z-index: 1;
+}
+.hp-brand-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(13px, 1.6vw, 17px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.hp-brand-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.hp-brand-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.hp-brand-badge-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 300;
+  color: var(--accent-dk);
+  line-height: 1;
+}
+.hp-brand-badge-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hp-brand-sep {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+}
 `
 
 /*  helpers  */
@@ -754,6 +872,39 @@ function HomePage() {
 
         {/* HERO */}
         <Hero slides={heroSlides} />
+
+        {/* BRAND IDENTITY STRIP */}
+        <div className="hp-brand">
+          {/* top decorative divider */}
+          <div className="hp-brand-divider">
+            <span className="hp-brand-divider-line" />
+            <span className="hp-brand-divider-diamond" />
+            <span className="hp-brand-divider-line right" />
+          </div>
+
+          {/* Logo */}
+          <div className="hp-brand-logo-wrap">
+            <img
+              src="/images/DazzlerBeauty.jpeg"
+              alt="Dazzler Beauty — Honey Nails & Academy"
+              className="hp-brand-logo"
+            />
+          </div>
+
+          {/* Tagline */}
+          <p className="hp-brand-tagline">
+            Luxury Nail Artistry &amp; Beauty Academy · Pune
+          </p>
+
+
+
+          {/* bottom decorative divider */}
+          <div className="hp-brand-divider">
+            <span className="hp-brand-divider-line" />
+            <span className="hp-brand-divider-diamond" />
+            <span className="hp-brand-divider-line right" />
+          </div>
+        </div>
 
         {/* ABOUT */}
         <Section className="hp-about">

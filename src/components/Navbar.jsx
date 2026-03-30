@@ -2,14 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 const serviceLinks = [
-  { to: '/nails',              label: 'Nails' },
-  { to: '/lashes',             label: 'Lashes' },
-  { to: '/skin',               label: 'Skin' },
-  { to: '/pedicure',           label: 'Pedicure' },
-  { to: '/manicure',           label: 'Manicure' },
-  { to: '/darklip-correction', label: 'DarkLip Correction' },
-  { to: '/microblading',       label: 'Microblading' },
-  { to: '/waxing',             label: 'Waxing' },
+  { to: '/nails',      label: 'Nails' },
+  { to: '/jewellery',  label: 'Jewellery' },
 ]
 
 const galleryLinks = [
