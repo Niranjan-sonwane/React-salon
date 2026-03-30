@@ -45,7 +45,7 @@ export default function SpecialtySection() {
           >
             {/* After Image (Primary) */}
             <div className="ll-comparison-after">
-              <img src="/images/nail_after.png" alt="After treatment" />
+              <img src="/images/nails images/4.jpeg" alt="After treatment" />
             </div>
 
             {/* Before Image (Overlayed / Clipped) */}
@@ -53,7 +53,7 @@ export default function SpecialtySection() {
               className="ll-comparison-before"
               style={{ width: `${sliderPos}%` }}
             >
-              <img src="/images/nail_before.png" alt="Before treatment" />
+              <img src="/images/nails images/2.jpeg" alt="Before treatment" />
             </div>
 
             {/* Slider Line / Handle */}

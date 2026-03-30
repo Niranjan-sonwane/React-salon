@@ -434,8 +434,8 @@ function Navbar() {
           </nav>
 
           {/* LOGO  contained within 72px bar */}
-          <Link to="/" className="ll-nav-logo" aria-label="Honey Nails & Academy  Home">
-            <img src="/images/DazzlerBeauty.jpeg" alt="Honey Nails & Academy" />
+          <Link to="/" className="ll-nav-logo" aria-label="Dazzler Beauty Home">
+            <img src="/images/DazzlerBeauty.jpeg" alt="Dazzler Beauty" />
           </Link>
 
           <button

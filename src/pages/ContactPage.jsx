@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&display=swap');
@@ -243,7 +243,7 @@ export default function ContactPage() {
           <div className="lal-hero-ring" aria-hidden="true" />
           <div className="lal-hero-tag">
             <span className="lal-hero-tag-dot" />
-            Honey Nails &amp; Academy
+            Dazzler Beauty
           </div>
           <h1>Let's <i>connect</i></h1>
           <p className="lal-hero-sub">
