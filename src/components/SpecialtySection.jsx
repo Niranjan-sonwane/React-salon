@@ -1,13 +1,24 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export default function SpecialtySection() {
   const navigate = useNavigate()
   const [sliderPos, setSliderPos] = useState(50)
+  const wrapperRef = useRef(null)
 
   const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
+    if (!wrapperRef.current) return
+    const rect = wrapperRef.current.getBoundingClientRect()
+    const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0)
+    const x = ((clientX - rect.left) / rect.width) * 100
+    setSliderPos(Math.min(Math.max(x, 0), 100))
+  }
+
+  const handleTouchMove = (e) => {
+    if (!wrapperRef.current) return
+    const rect = wrapperRef.current.getBoundingClientRect()
+    const clientX = e.touches[0].clientX
+    const x = ((clientX - rect.left) / rect.width) * 100
     setSliderPos(Math.min(Math.max(x, 0), 100))
   }
 
@@ -40,8 +51,9 @@ export default function SpecialtySection() {
         <div className="ll-specialty-comparison">
           <div 
             className="ll-comparison-wrapper"
+            ref={wrapperRef}
             onMouseMove={handleMouseMove}
-            onTouchMove={(e) => handleMouseMove(e.touches[0])}
+            onTouchMove={handleTouchMove}
           >
             {/* After Image (Primary) */}
             <div className="ll-comparison-after">

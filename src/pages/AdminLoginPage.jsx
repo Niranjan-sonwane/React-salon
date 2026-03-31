@@ -133,7 +133,7 @@ export default function AdminLoginPage() {
                   id="admin-email"
                   type="email"
                   autoComplete="email"
-                  placeholder="admin@dazzlerbeauty.com"
+                  placeholder={import.meta.env.VITE_ADMIN_EMAIL || "dazzlerbeauty@gmail.com"}
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (emailErr) setEmailErr("") }}
                   onBlur={handleEmailBlur}
@@ -241,7 +241,7 @@ export default function AdminLoginPage() {
               <line x1="12" y1="8" x2="12" y2="8"/>
               <line x1="12" y1="12" x2="12" y2="16"/>
             </svg>
-            Demo  use <strong>admin@dazzlerbeauty.com</strong> / <strong>Admin@2026</strong>
+            Demo  use <strong>{import.meta.env.VITE_ADMIN_EMAIL || "dazzlerbeauty@gmail.com"}</strong> / <strong>{import.meta.env.VITE_ADMIN_PASSWORD || "Admin@2026"}</strong>
           </p>
         </div>
       </div>

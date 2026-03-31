@@ -597,6 +597,7 @@ function BASlider() {
   const dragging  = useRef(false)
 
   const calcPct = (clientX) => {
+    if (!wrapRef.current) return
     const rect = wrapRef.current.getBoundingClientRect()
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width))
     setPct((x / rect.width) * 100)
