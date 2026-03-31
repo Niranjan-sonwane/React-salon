@@ -320,7 +320,7 @@ function PortfolioPage() {
       <main className="pf-root page-content">
         <section className="pf-hero">
           <div className="pf-hero-inner">
-            <p className="pf-tag">Honey Nails & Academy Signature Work</p>
+            <p className="pf-tag">Dazzler Beauty Signature Work</p>
             <h1 className="pf-title">Portfolio</h1>
             <p className="pf-subtitle">
               Every frame reflects precision artistry, luxury finishes, and results designed to elevate your personal style.

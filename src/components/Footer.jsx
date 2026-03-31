@@ -1,4 +1,4 @@
-﻿const styles = `
+const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap');
 
   .ft-root {
@@ -316,7 +316,7 @@ export default function Footer() {
 
           {/* Brand + newsletter */}
           <div>
-            <p className="ft-brand-name">Honey Nails<br /><em>&amp; Academy</em></p>
+            <p className="ft-brand-name">Dazzler<br /><em>Beauty</em></p>
             <p className="ft-tagline">
               Questions or bookings? Reach out and we'll get back to you as soon as possible.
             </p>
@@ -364,7 +364,7 @@ export default function Footer() {
 
         {/*  Bottom  */}
         <div className="ft-bottom">
-          <span className="ft-copy"> 2026 Honey Nails &amp; Academy. All rights reserved.</span>
+          <span className="ft-copy"> 2026 Dazzler Beauty. All rights reserved.</span>
           <div className="ft-legal">
             <a href="#">Privacy Policy</a>
             <div className="ft-legal-dot" />

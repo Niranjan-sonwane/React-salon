@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { services } from '../data/services'
 import SpecialtySection from '../components/SpecialtySection'
@@ -475,6 +475,124 @@ const CSS = `
   .hp-why-btns { flex-direction: column; }
   .hp-why-btns a { text-align: center; }
 }
+
+/*  BRAND IDENTITY STRIP  */
+.hp-brand {
+  background: var(--cream);
+  padding: clamp(44px, 7vw, 80px) clamp(24px, 6vw, 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.hp-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 90% at 50% 50%, rgba(200,169,110,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hp-brand-divider {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 640px;
+}
+.hp-brand-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200,169,110,.45));
+}
+.hp-brand-divider-line.right {
+  background: linear-gradient(to left, transparent, rgba(200,169,110,.45));
+}
+.hp-brand-divider-diamond {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  opacity: .7;
+}
+.hp-brand-logo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hp-brand-logo-wrap::before,
+.hp-brand-logo-wrap::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(200,169,110,.12);
+  pointer-events: none;
+}
+.hp-brand-logo-wrap::before {
+  width: clamp(170px, 22vw, 240px);
+  height: clamp(170px, 22vw, 240px);
+}
+.hp-brand-logo-wrap::after {
+  width: clamp(210px, 28vw, 300px);
+  height: clamp(210px, 28vw, 300px);
+}
+.hp-brand-logo {
+  width: clamp(120px, 16vw, 190px);
+  height: auto;
+  display: block;
+  mix-blend-mode: multiply;
+  filter: contrast(1.05) brightness(1.06);
+  position: relative;
+  z-index: 1;
+}
+.hp-brand-tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(13px, 1.6vw, 17px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.hp-brand-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.hp-brand-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.hp-brand-badge-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 300;
+  color: var(--accent-dk);
+  line-height: 1;
+}
+.hp-brand-badge-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hp-brand-sep {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+}
 `
 
 /*  helpers  */
@@ -515,7 +633,7 @@ function Hero({ slides }) {
             </div>
             <div className="hp-hero-overlay" />
             <div className="hp-hero-content">
-              <div className="hp-hero-eyebrow">Honey Nails &amp; Academy</div>
+              <div className="hp-hero-eyebrow">Dazzler Beauty</div>
               <h2>{s.title}</h2>
               <p>{s.text}</p>
               <Link to="/appointment" className="hp-btn">Book Now </Link>
@@ -709,7 +827,7 @@ function HomePage() {
       desktop: '/images/slide show/hero_1.png',
       mobile:  '/images/slide show/hero_1.png',
       title:   'Rose Gold Chrome Perfection',
-      text:    "Honey Nails & Academy in Pune is a haven where beauty meets precision, offering luxurious nail art services tailored to bring out your natural radiance.",
+      text:    "Dazzler Beauty in Pune is a haven where beauty meets precision, offering luxurious nail art services tailored to bring out your natural radiance.",
     },
     {
       id: 'hero-2',
@@ -730,13 +848,13 @@ function HomePage() {
       desktop: '/images/slide show/hero_4.png',
       mobile:  '/images/slide show/hero_4.png',
       title:   'Begin Your Beauty Journey Here',
-      text:    "With our passion for aesthetics and commitment to excellence, Honey Nails & Academy is your trusted destination for transformative nail art experiences.",
+      text:    "With our passion for aesthetics and commitment to excellence, Dazzler Beauty is your trusted destination for transformative nail art experiences.",
     },
   ]
 
   const testimonials = [
     { name: 'Sneha P',  text: 'Not only was the end result beautiful, but it also gave me a sense of confidence and satisfaction. The staff ensured every detail was smooth and polished.' },
-    { name: 'Ayisha',   text: "Honey Nails & Academy transformed my look with unmatched care and detail. The result was natural, defined, and exactly what I wanted." },
+    { name: 'Ayisha',   text: "Dazzler Beauty transformed my look with unmatched care and detail. The result was natural, defined, and exactly what I wanted." },
     { name: 'Kshipra',  text: 'I tried microblading with ombre shading, and the result was fantastic. The team made the whole experience comfortable and precise.' },
   ]
 
@@ -756,6 +874,39 @@ function HomePage() {
         {/* HERO */}
         <Hero slides={heroSlides} />
 
+        {/* BRAND IDENTITY STRIP */}
+        <div className="hp-brand">
+          {/* top decorative divider */}
+          <div className="hp-brand-divider">
+            <span className="hp-brand-divider-line" />
+            <span className="hp-brand-divider-diamond" />
+            <span className="hp-brand-divider-line right" />
+          </div>
+
+          {/* Logo */}
+          <div className="hp-brand-logo-wrap">
+            <img
+              src="/images/DazzlerBeauty.jpeg"
+              alt="Dazzler Beauty"
+              className="hp-brand-logo"
+            />
+          </div>
+
+          {/* Tagline */}
+          <p className="hp-brand-tagline">
+            Luxury Nail Artistry &amp; Beauty Academy · Pune
+          </p>
+
+
+
+          {/* bottom decorative divider */}
+          <div className="hp-brand-divider">
+            <span className="hp-brand-divider-line" />
+            <span className="hp-brand-divider-diamond" />
+            <span className="hp-brand-divider-line right" />
+          </div>
+        </div>
+
         {/* ABOUT */}
         <Section className="hp-about">
           <div className="hp-about-grid">
@@ -763,7 +914,7 @@ function HomePage() {
               <Eyebrow>About Us</Eyebrow>
               <h2 className="hp-section-title">Beauty is Crafted with<br /><em>Expertise</em></h2>
               <p className="hp-body-text">
-                Honey Nails &amp; Academy in Pune is a haven where beauty meets
+                Dazzler Beauty in Pune is a haven where beauty meets
                 precision, offering luxurious services tailored to bring out your natural radiance.
               </p>
               <div><Link to="/about" className="hp-btn hp-btn-dark">Read More </Link></div>
@@ -800,7 +951,7 @@ function HomePage() {
               <Eyebrow>Why Choose Us</Eyebrow>
               <h2 className="hp-section-title">Your Beauty Deserves<br /><em>Expert Care</em></h2>
               <p className="hp-body-text" style={{ marginTop: 14 }}>
-                Choosing Honey Nails &amp; Academy means choosing a team dedicated to
+                Choosing Dazzler Beauty means choosing a team dedicated to
                 precision, safety, and the art of beauty.
               </p>
               <ul className="hp-why-list">

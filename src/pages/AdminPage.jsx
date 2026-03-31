@@ -375,7 +375,7 @@ export default function AdminPage() {
         <div className="admin-sidebar__brand">
           <span className="admin-sidebar__logo"></span>
           <div>
-            <p className="admin-sidebar__name">Honey Nails & Academy</p>
+            <p className="admin-sidebar__name">Dazzler Beauty</p>
             <p className="admin-sidebar__role">Admin Panel</p>
           </div>
         </div>

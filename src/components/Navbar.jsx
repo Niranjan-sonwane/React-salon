@@ -2,14 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 const serviceLinks = [
-  { to: '/nails',              label: 'Nails' },
-  { to: '/lashes',             label: 'Lashes' },
-  { to: '/skin',               label: 'Skin' },
-  { to: '/pedicure',           label: 'Pedicure' },
-  { to: '/manicure',           label: 'Manicure' },
-  { to: '/darklip-correction', label: 'DarkLip Correction' },
-  { to: '/microblading',       label: 'Microblading' },
-  { to: '/waxing',             label: 'Waxing' },
+  { to: '/nails',      label: 'Nails' },
+  { to: '/jewellery',  label: 'Jewellery' },
 ]
 
 const galleryLinks = [
@@ -440,8 +434,8 @@ function Navbar() {
           </nav>
 
           {/* LOGO  contained within 72px bar */}
-          <Link to="/" className="ll-nav-logo" aria-label="Honey Nails & Academy  Home">
-            <img src="/images/DazzlerBeauty.jpeg" alt="Honey Nails & Academy" />
+          <Link to="/" className="ll-nav-logo" aria-label="Dazzler Beauty Home">
+            <img src="/images/DazzlerBeauty.jpeg" alt="Dazzler Beauty" />
           </Link>
 
           <button

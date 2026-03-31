@@ -152,7 +152,7 @@ export default function AppointmentPage() {
       <section className="appt-hero" style={{ backgroundImage: "url('/images/nails images/1.jpeg')" }}>
         <div className="appt-hero__overlay" />
         <div className="appt-hero__content">
-          <span className="appt-hero__eyebrow">Honey Nails &amp; Academy</span>
+          <span className="appt-hero__eyebrow">Dazzler Beauty</span>
           <h1 className="appt-hero__title">Book an Appointment</h1>
           <p className="appt-hero__sub">Secure your slot with ease. Walk-ins welcome, reservations preferred.</p>
           <div className="appt-hero__badges">
@@ -537,7 +537,7 @@ export default function AppointmentPage() {
               {/* Info Card */}
               <div className="appt-card appt-info-card">
                 <span className="appt-info-header-tag">Nail Specialists</span>
-                <h3 className="appt-info-title">Honey Nails &amp; Academy</h3>
+                <h3 className="appt-info-title">Dazzler Beauty</h3>
                 <p className="appt-info-sub">Premium beauty services crafted with care and expertise.</p>
                 <div className="appt-info-hours">
                   <div className="appt-info-hour-row">
