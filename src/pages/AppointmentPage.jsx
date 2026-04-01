@@ -68,6 +68,8 @@ export default function AppointmentPage() {
   const [dayAvail, setDayAvail] = useState(null)
   const [slotAvail, setSlotAvail] = useState([])
 
+  const dayServices = Array.isArray(dayAvail?.services) ? dayAvail.services : []
+
   useEffect(() => {
     setIsLoadingAvail(true)
     getDayAvailability(dateKey)
@@ -87,8 +89,8 @@ export default function AppointmentPage() {
   }, [serviceId, dateKey])
 
   /* total booked count for the selected date */
-  const totalBooked = dayAvail ? dayAvail.services.reduce((a, s) => a + s.totalBooked, 0) : 0
-  const totalCap = dayAvail ? dayAvail.services.reduce((a, s) => a + s.capacity, 0) : 0
+  const totalBooked = dayServices.reduce((a, s) => a + (s?.totalBooked || 0), 0)
+  const totalCap = dayServices.reduce((a, s) => a + (s?.capacity || 0), 0)
 
   const availableSlotAvail = (slotAvail || []).filter(s => (s?.remaining ?? 0) > 0)
 
@@ -322,7 +324,7 @@ export default function AppointmentPage() {
                     <div className="appt-booking-rows">
                       {!dayAvail || dayAvail.services.filter(s => s.totalBooked > 0).length === 0
                         ? <p className="appt-empty-note">No bookings yet for this day. </p>
-                        : dayAvail.services.filter(s => s.totalBooked > 0).map(s => (
+                        : dayServices.filter(s => (s?.totalBooked || 0) > 0).map(s => (
                             <div key={s.id} className="appt-brow">
                               <div className="appt-brow__left">
                                 <span className="appt-brow__icon">{s.icon}</span>
@@ -361,9 +363,11 @@ export default function AppointmentPage() {
 
                     {!dayAvail ? (
                       <p className="appt-empty-note">Loading capacity information...</p>
+                    ) : dayServices.length === 0 ? (
+                      <p className="appt-empty-note">No services are available for booking on this day.</p>
                     ) : (
                       <div className="appt-service-grid">
-                        {dayAvail.services.map((s) => {
+                        {dayServices.map((s) => {
                           const isFull = s.remaining <= 0
                           const isSel = serviceId === s.id
                           return (
@@ -563,7 +567,7 @@ export default function AppointmentPage() {
                 <p className="appt-card__eyebrow">Quick Reference</p>
                 <h3 className="appt-card__title" style={{marginBottom:"14px"}}>Services & Duration</h3>
                 <div className="appt-ref-list">
-                  {(dayAvail ? dayAvail.services : BASE_SERVICES).map((s) => (
+                  {(dayServices.length > 0 ? dayServices : BASE_SERVICES).map((s) => (
                     <div key={s.id} className="appt-ref-row">
                       <div className="appt-ref-row__left">
                         <span className="appt-ref-row__icon">{s.icon}</span>

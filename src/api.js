@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api"
+const API_BASE_URL = "https://backend-for-salaon.onrender.com/api"
 
 /**
  * Standard fetch helper that includes authorization headers for admin requests
