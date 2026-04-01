@@ -70,6 +70,37 @@ export default function AppointmentPage() {
 
   const dayServices = Array.isArray(dayAvail?.services) ? dayAvail.services : []
 
+  // Month-level availability map for calendar labels (Open/Closed/No Slots)
+  // shape: { [dateKey]: { isOpen: boolean, hasSlots: boolean, isError?: boolean } }
+  const [monthAvailMap, setMonthAvailMap] = useState({})
+
+  useEffect(() => {
+    let cancelled = false
+
+    const monthKeys = Array.from(
+      new Set(calendar.filter(Boolean).map(getDateKey))
+    )
+
+    Promise.all(
+      monthKeys.map(async (key) => {
+        try {
+          const res = await getDayAvailability(key)
+          const hasSlots = Array.isArray(res?.timeSlots) && res.timeSlots.length > 0
+          return [key, { isOpen: !!res?.isOpen, hasSlots, isError: !!res?._error }]
+        } catch {
+          return [key, { isOpen: false, hasSlots: false, isError: true }]
+        }
+      })
+    ).then((pairs) => {
+      if (cancelled) return
+      const next = {}
+      for (const [k, v] of pairs) next[k] = v
+      setMonthAvailMap(next)
+    })
+
+    return () => { cancelled = true }
+  }, [calendar, getDayAvailability])
+
   useEffect(() => {
     setIsLoadingAvail(true)
     getDayAvailability(dateKey)
@@ -96,8 +127,9 @@ export default function AppointmentPage() {
 
   /*  step 1 helpers  */
   const handleDateClick = (key) => {
-    const cfg = getDayConfig(key)
-    if (!cfg.isOpen) return          // don't allow clicking closed days
+    // Use public availability state for client calendar
+    const calState = monthAvailMap?.[key]
+    if (calState && (!calState.isOpen || !calState.hasSlots)) return
     setDateKey(key)
     setServiceId("")
     setTimeSlot("")
@@ -236,10 +268,12 @@ export default function AppointmentPage() {
                       {calendar.map((date, i) => {
                         if (!date) return <div key={i} className="appt-cal-empty" />
                         const key = getDateKey(date)
-                        const cfg = getDayConfig(key)
-                        // Removed the bkMap dot logic as we don't fetch full month data
+                        const calState = monthAvailMap?.[key]
+                        const isOpen = calState ? !!calState.isOpen : true
+                        const hasSlots = calState ? !!calState.hasSlots : true
                         const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate())
-                        const isClosed = !cfg.isOpen
+                        const isClosed = !isOpen
+                        const isNoSlots = isOpen && !hasSlots
                         const isSel = key === dateKey
                         const isToday = key === todayKey
 
@@ -247,16 +281,19 @@ export default function AppointmentPage() {
                           <button
                             key={key}
                             type="button"
-                            disabled={isPast || isClosed}
-                            className={`appt-day${isSel?" is-selected":""}${isToday?" is-today":""}${isPast?" is-past":""}${isClosed?" is-closed":""}`}
+                            disabled={isPast || isClosed || isNoSlots}
+                            className={`appt-day${isSel?" is-selected":""}${isToday?" is-today":""}${isPast?" is-past":""}${isClosed?" is-closed":""}${isNoSlots?" is-noslots":""}`}
                             onClick={() => handleDateClick(key)}
-                            title={isClosed ? "Shop closed this day" : undefined}
+                            title={isClosed ? "Shop closed this day" : (isNoSlots ? "No slots available on this day" : undefined)}
                           >
                             <span className="appt-day__num">{date.getDate()}</span>
-                            {isClosed
-                              ? <span className="appt-day__closed">Closed</span>
-                              : <span className="appt-day__count">Open</span>
-                            }
+                            {isClosed ? (
+                              <span className="appt-day__closed">Closed</span>
+                            ) : isNoSlots ? (
+                              <span className="appt-day__count">No Slots</span>
+                            ) : (
+                              <span className="appt-day__count">Open</span>
+                            )}
                           </button>
                         )
                       })}
