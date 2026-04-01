@@ -90,6 +90,8 @@ export default function AppointmentPage() {
   const totalBooked = dayAvail ? dayAvail.services.reduce((a, s) => a + s.totalBooked, 0) : 0
   const totalCap = dayAvail ? dayAvail.services.reduce((a, s) => a + s.capacity, 0) : 0
 
+  const availableSlotAvail = (slotAvail || []).filter(s => (s?.remaining ?? 0) > 0)
+
   /*  step 1 helpers  */
   const handleDateClick = (key) => {
     const cfg = getDayConfig(key)
@@ -419,11 +421,11 @@ export default function AppointmentPage() {
                     {/* Time Slots */}
                     <div className="appt-time-section">
                       <p className="appt-section-label">Available Time Slots</p>
-                      {!slotAvail || slotAvail.length === 0
+                      {!availableSlotAvail || availableSlotAvail.length === 0
                         ? <p className="appt-empty-note">No time slots available for the selected duration/day.</p>
                         : (
                           <div className="appt-time-grid">
-                            {slotAvail.map((slotData) => {
+                            {availableSlotAvail.map((slotData) => {
                               const slot = slotData.time
                               const remaining = slotData.remaining
                               const isTaken = remaining <= 0

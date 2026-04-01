@@ -12,6 +12,7 @@ export function BookingProvider({ children }) {
   const [bookings, setBookings] = useState([])
   const [baseServices, setBaseServices] = useState([])
   const [courseData, setCourseData] = useState(null)
+  const [manualSlots, setManualSlots] = useState([])
 
   useEffect(() => {
     fetchApi("/services")
@@ -32,6 +33,9 @@ export function BookingProvider({ children }) {
 
       const bookRes = await fetchApi("/admin/bookings")
       if (bookRes?.bookings) setBookings(bookRes.bookings)
+
+      const slotsRes = await fetchApi("/admin/slots")
+      if (Array.isArray(slotsRes)) setManualSlots(slotsRes)
     } catch (err) {
       // 401 is expected when the user is not logged in as admin.
       if (err?.status === 401) return
@@ -198,6 +202,30 @@ export function BookingProvider({ children }) {
     }
   }, [])
 
+  const addManualSlot = useCallback(async (slot) => {
+    try {
+      const res = await fetchApi("/admin/slots", {
+        method: "POST",
+        body: JSON.stringify(slot),
+      })
+      setManualSlots(prev => [...prev, res])
+      return res
+    } catch (e) {
+      console.error("Failed to add manual slot", e)
+      throw e
+    }
+  }, [])
+
+  const deleteManualSlot = useCallback(async (id) => {
+    try {
+      await fetchApi(`/admin/slots/${id}`, { method: "DELETE" })
+      setManualSlots(prev => prev.filter(s => s.id !== id))
+    } catch (e) {
+      console.error("Failed to delete manual slot", e)
+      throw e
+    }
+  }, [])
+
   const addBooking = useCallback(async (booking) => {
     try {
       const res = await fetchApi("/bookings", {
@@ -243,6 +271,9 @@ export function BookingProvider({ children }) {
         updateServiceOverride,
         course: courseData,
         updateCourse,
+        manualSlots,
+        addManualSlot,
+        deleteManualSlot,
       }}
     >
       {children}

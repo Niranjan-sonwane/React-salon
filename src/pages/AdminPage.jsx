@@ -53,7 +53,7 @@ const formatSlotLabel = (time) => {
 }
 
 /*  Admin Panel Views  */
-const VIEWS = ["dashboard", "calendar", "bookings", "services", "courses"]
+const VIEWS = ["dashboard", "calendar", "slots", "bookings", "services", "courses"]
 
 export default function AdminPage() {
   const {
@@ -70,6 +70,9 @@ export default function AdminPage() {
     updateServiceOverride,
     course,
     updateCourse,
+    manualSlots,
+    addManualSlot,
+    deleteManualSlot,
   } = useBooking()
 
   const { logout } = useAuth()
@@ -101,6 +104,12 @@ export default function AdminPage() {
   // Course editing state
   const [editCourse, setEditCourse] = useState(null)
   const [isSavingCourse, setIsSavingCourse] = useState(false)
+
+  // Slot Management State
+  const [newSlotDate, setNewSlotDate] = useState(todayKey)
+  const [newSlotTime, setNewSlotTime] = useState("")
+  const [newSlotService, setNewSlotService] = useState("")
+  const [isAddingSlot, setIsAddingSlot] = useState(false)
 
   useEffect(() => {
     if (course) setEditCourse(course)
@@ -356,6 +365,28 @@ export default function AdminPage() {
     setEditingServices(next)
   }
 
+  const handleAddManualSlot = async (e) => {
+    e.preventDefault()
+    if (!newSlotDate || !newSlotTime || !newSlotService) {
+      alert("Please fill in all fields (Date, Time, Service).")
+      return
+    }
+
+    setIsAddingSlot(true)
+    try {
+      await addManualSlot({
+        date: newSlotDate,
+        startTime: normalizeTime(newSlotTime),
+        serviceId: newSlotService,
+      })
+      setNewSlotTime("")
+    } catch (err) {
+      alert("Failed to add slot: " + err.message)
+    } finally {
+      setIsAddingSlot(false)
+    }
+  }
+
   const daySlotPool = useMemo(() => {
     if (!dayConfigForEdit) return sortTimeSlots(shopConfig.defaultTimeSlots)
     
@@ -384,6 +415,7 @@ export default function AdminPage() {
           {[
             { id:"dashboard", label:"Dashboard",  icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
             { id:"calendar",  label:"Manage Days", icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+            { id:"slots",     label:"Slot Manager", icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg> },
             { id:"bookings",  label:"Bookings",    icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> },
             { id:"services",  label:"Services",    icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> },
             { id:"courses",   label:"Academy",     icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> },
@@ -612,6 +644,90 @@ export default function AdminPage() {
                   </div>
                 )
               }
+            </div>
+          </div>
+        )}
+
+        {/*  SLOT MANAGER  */}
+        {view === "slots" && (
+          <div className="admin-view">
+            <div className="admin-view__head">
+              <h1 className="admin-view__title">Slot Manager</h1>
+              <p className="admin-view__sub">Manually define available booking slots. Each slot is for one person only.</p>
+            </div>
+
+            <div className="admin-card">
+              <div className="admin-card__head">
+                <h2 className="admin-card__title">Add New Slot</h2>
+              </div>
+              <form onSubmit={handleAddManualSlot} className="admin-slot-form" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: "12px", alignItems: "end" }}>
+                <div>
+                  <label className="admin-form-label">Date</label>
+                  <input type="date" value={newSlotDate} onChange={e => setNewSlotDate(e.target.value)} className="admin-time-input" style={{ width: "100%" }} required />
+                </div>
+                <div>
+                  <label className="admin-form-label">Time</label>
+                  <input type="time" value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} className="admin-time-input" style={{ width: "100%" }} required />
+                </div>
+                <div>
+                  <label className="admin-form-label">Service</label>
+                  <select value={newSlotService} onChange={e => setNewSlotService(e.target.value)} className="admin-time-input" style={{ width: "100%", padding: "8px" }} required>
+                    <option value="">Select Service</option>
+                    {BASE_SERVICES.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                  </select>
+                </div>
+                <button type="submit" className="admin-time-add" disabled={isAddingSlot} style={{ height: "38px" }}>
+                  {isAddingSlot ? "Adding..." : "Add Slot"}
+                </button>
+              </form>
+            </div>
+
+            <div className="admin-card">
+              <div className="admin-card__head">
+                <h2 className="admin-card__title">Defined Slots</h2>
+                <div className="admin-badge">{manualSlots.length} Total</div>
+              </div>
+              
+              {manualSlots.length === 0 ? (
+                <p className="admin-empty">No manual slots defined yet.</p>
+              ) : (
+                <div className="admin-table-wrap">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Service</th>
+                        <th>Status</th>
+                        <th style={{ textAlign: "right" }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...manualSlots].sort((a,b) => (a.date+a.startTime).localeCompare(b.date+b.startTime)).map(s => (
+                        <tr key={s.id}>
+                          <td>{readableDate(s.date)}</td>
+                          <td>{formatSlotLabel(s.startTime)}</td>
+                          <td>{BASE_SERVICES.find(svc => svc.id === s.serviceId)?.title || s.serviceId}</td>
+                          <td>
+                            <span className={`admin-badge admin-badge--${s.isBooked ? "past" : "upcoming"}`}>
+                              {s.isBooked ? "Booked" : "Available"}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            <button 
+                              className="admin-reset-btn" 
+                              style={{ color: "var(--c-red)", padding: "4px 8px" }}
+                              onClick={() => { if(confirm("Are you sure you want to delete this slot?")) deleteManualSlot(s.id) }}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}
