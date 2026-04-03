@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 const serviceLinks = [
   { to: '/nails',      label: 'Nails' },
+  { to: '/cosmetics',  label: 'Cosmetics' },
   { to: '/jewellery',  label: 'Jewellery' },
 ]
 

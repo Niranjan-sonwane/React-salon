@@ -14,6 +14,27 @@ export const services = [
     ],
   },
   {
+    slug: 'cosmetics',
+    aliases: ['cosmetic', 'makeup'],
+    title: 'Cosmetics',
+    shortDescription:
+      'Professional cosmetics and makeup services tailored for events, shoots, and everyday glam.',
+    image: '/images/cosmetics/1.jpeg',
+    bannerImage: '/images/cosmetics/3.jpeg',
+    detailImage: '/images/cosmetics/2.jpeg',
+    galleryImages: [
+      '/images/cosmetics/1.jpeg',
+      '/images/cosmetics/2.jpeg',
+      '/images/cosmetics/3.jpeg',
+      '/images/cosmetics/4.jpeg',
+      '/images/cosmetics/5.jpeg',
+    ],
+    descriptions: [
+      'Our cosmetics service blends skin-friendly products with expert techniques to create a polished, camera-ready finish.',
+      'Whether you prefer soft natural glam or bold party looks, every makeover is customized to your features and occasion.',
+    ],
+  },
+  {
     slug: 'jewellery',
     aliases: ['jewelry'],
     title: 'Jewellery',
