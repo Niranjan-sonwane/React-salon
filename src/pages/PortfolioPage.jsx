@@ -308,6 +308,26 @@ function PortfolioPage() {
     '/images/Jewellery/10.jpeg',
   ]
 
+  const cosmeticsItems = [
+    '/images/cosmetics/1.jpeg',
+    '/images/cosmetics/2.jpeg',
+    '/images/cosmetics/3.jpeg',
+    '/images/cosmetics/4.jpeg',
+    '/images/cosmetics/5.jpeg',
+    '/images/cosmetics/6.jpeg',
+    '/images/cosmetics/7.jpeg',
+    '/images/cosmetics/8.jpeg',
+    '/images/cosmetics/9.jpeg',
+    '/images/cosmetics/10.jpeg',
+    '/images/cosmetics/11.jpeg',
+    '/images/cosmetics/12.jpeg',
+    '/images/cosmetics/13.jpeg',
+    '/images/cosmetics/14.jpeg',
+    '/images/cosmetics/15.jpeg',
+    '/images/cosmetics/16.jpeg',
+    '/images/cosmetics/17.jpeg',
+  ]
+
   const tileClass = (index) => {
     if (index % 7 === 0 || index % 11 === 0) return 'pf-card is-wide'
     if (index % 5 === 0) return 'pf-card is-tall'
@@ -363,6 +383,26 @@ function PortfolioPage() {
             {jewelleryItems.map((src, index) => (
               <figure className={tileClass(index)} key={src}>
                 <img src={src} alt={`Jewellery ${index + 1}`} loading="lazy" />
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        <section className="pf-body pf-anchor" id="cosmetics">
+          <div className="pf-intro">
+            <div>
+              <h2 className="pf-heading">Cosmetics</h2>
+              <p className="pf-copy">
+                Discover cosmetics looks focused on clean blends, refined finishes, and camera-ready detail.
+              </p>
+            </div>
+            <span className="pf-badge">17 Selected Works</span>
+          </div>
+
+          <div className="pf-grid">
+            {cosmeticsItems.map((src, index) => (
+              <figure className={tileClass(index)} key={src}>
+                <img src={src} alt={`Cosmetics ${index + 1}`} loading="lazy" />
               </figure>
             ))}
           </div>
