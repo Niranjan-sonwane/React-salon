@@ -52,7 +52,7 @@ const CSS = `
   flex: 0 0 100%;
   width: 100%;
   position: relative;
-  min-height: clamp(520px, 82vh, 860px);
+  min-height: clamp(480px, calc(100vh - 72px), 760px);
   overflow: hidden;          /* each slide clips its own image */
 }
 .hp-hero-img {
@@ -65,7 +65,7 @@ const CSS = `
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center bottom;
   opacity: 0.92;             /* increased opacity to make image brighter */
   display: block;
 }
@@ -89,9 +89,9 @@ const CSS = `
   position: relative;
   z-index: 2;
   padding:
-    clamp(90px, 14vw, 160px)   /* top */
+    clamp(70px, 12vw, 130px)   /* top */
     clamp(24px, 7vw, 96px)     /* right */
-    clamp(72px, 10vw, 130px)   /* bottom */
+    clamp(60px, 9vw, 110px)    /* bottom */
     clamp(24px, 7vw, 96px);    /* left  matches right for symmetry */
   max-width: 660px;
 }

@@ -68,7 +68,7 @@ function Navbar() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          height: 90px;
+          height: 72px;
           overflow: visible;
         }
 
@@ -147,7 +147,7 @@ function Navbar() {
 
         .ll-nav-dropdown {
           position: absolute;
-          top: calc(100% + 18px);
+          top: calc(100% + 12px);
           left: 50%;
           transform: translateX(-50%) translateY(6px);
           min-width: 210px;
@@ -199,20 +199,20 @@ function Navbar() {
         }
 
         /*  LOGO 
-           KEY FIX: max-height: 75px keeps logo inside the 90px bar always.
+           KEY FIX: max-height: 60px keeps logo inside the 72px bar always.
            The parent has overflow:hidden as a second safeguard. */
         .ll-nav-logo {
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 0 clamp(12px, 1.8vw, 28px);
-          height: 90px;
+          height: 72px;
           overflow: hidden;
         }
         .ll-nav-logo img {
           width: auto;
           max-width: clamp(100px, 15vw, 180px);
-          max-height: 78px;
+          max-height: 60px;
           object-fit: contain;
           display: block;
           transition: opacity 0.2s;

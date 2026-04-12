@@ -49,7 +49,46 @@ const formatSlotLabel = (time) => {
   const normalized = normalizeTime(time)
   if (!normalized) return time
   const [hourStr, minuteStr] = normalized.split(":")
-  return `${hourStr.padStart(2, "0")}:${minuteStr}`
+  let h = parseInt(hourStr, 10)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  h = h % 12
+  h = h ? h : 12 // the hour '0' should be '12'
+  return `${h}:${minuteStr} ${ampm}`
+}
+
+const TimeInput12h = ({ value, onChange, label, style }) => {
+  const [h24, m] = (value || "09:00").split(":")
+  let h12 = parseInt(h24, 10)
+  const ampm = h12 >= 12 ? "PM" : "AM"
+  h12 = h12 % 12 || 12
+
+  const update = (newH12, newM, newAMPM) => {
+    let h = parseInt(newH12, 10)
+    if (newAMPM === "PM" && h < 12) h += 12
+    if (newAMPM === "AM" && h === 12) h = 0
+    onChange(`${String(h).padStart(2, '0')}:${newM}`)
+  }
+
+  return (
+    <div className="admin-time-12h" style={style}>
+      {label && <label className="admin-form-label">{label}</label>}
+      <div style={{ display: "flex", gap: "4px" }}>
+        <select value={h12} onChange={e => update(e.target.value, m, ampm)} className="admin-time-input" style={{ padding: "8px", flex: 1, minWidth:0 }}>
+          {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(h => <option key={h} value={h}>{h}</option>)}
+        </select>
+        <select value={m} onChange={e => update(h12, e.target.value, ampm)} className="admin-time-input" style={{ padding: "8px", flex: 1, minWidth:0 }}>
+          {[...Array(60).keys()].map(min => {
+            const mm = String(min).padStart(2, "0")
+            return <option key={mm} value={mm}>{mm}</option>
+          })}
+        </select>
+        <select value={ampm} onChange={e => update(h12, m, e.target.value)} className="admin-time-input" style={{ padding: "8px", width: "70px", flexShrink:0 }}>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+    </div>
+  )
 }
 
 /*  Admin Panel Views  */
@@ -574,46 +613,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Global Pre-Existing Slots */}
-            <div className="admin-card">
-              <div className="admin-card__head">
-                <h2 className="admin-card__title">Global Pre-Existing Slots</h2>
-                <p className="admin-card__sub">The following slots are standard default slots (or were added globally) and apply to all days without overrides.</p>
-              </div>
-
-              <div className="admin-time-builder" style={{ padding: 0, border: "none" }}>
-                <input
-                  type="time"
-                  className="admin-time-input"
-                  value={newGlobalSlot}
-                  onChange={(e) => setNewGlobalSlot(e.target.value)}
-                />
-                <button type="button" className="admin-time-add" onClick={addGlobalTime}>Add Slot</button>
-              </div>
-
-              <div className="admin-time-toggles" style={{ marginTop: "12px" }}>
-                {sortTimeSlots(shopConfig.defaultTimeSlots).map((t) => (
-                  <div key={t} className="admin-time-chip">
-                    <button
-                      type="button"
-                      className={`admin-time-toggle${shopConfig.defaultTimeSlots.includes(t)?" is-on":""}`}
-                      onClick={() => toggleGlobalTime(t)}
-                    >
-                      {formatSlotLabel(t)}
-                    </button>
-                    <button
-                      type="button"
-                      className="admin-time-remove"
-                      onClick={() => removeGlobalTime(t)}
-                      aria-label={`Remove ${formatSlotLabel(t)}`}
-                      title="Remove slot"
-                    >
-                      x
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* Recent Bookings */}
             <div className="admin-card">
@@ -665,10 +664,11 @@ export default function AdminPage() {
                   <label className="admin-form-label">Date</label>
                   <input type="date" value={newSlotDate} onChange={e => setNewSlotDate(e.target.value)} className="admin-time-input" style={{ width: "100%" }} required />
                 </div>
-                <div>
-                  <label className="admin-form-label">Time</label>
-                  <input type="time" value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} className="admin-time-input" style={{ width: "100%" }} required />
-                </div>
+                <TimeInput12h
+                  label="Time"
+                  value={newSlotTime}
+                  onChange={setNewSlotTime}
+                />
                 <div>
                   <label className="admin-form-label">Service</label>
                   <select value={newSlotService} onChange={e => setNewSlotService(e.target.value)} className="admin-time-input" style={{ width: "100%", padding: "8px" }} required>
@@ -851,24 +851,16 @@ export default function AdminPage() {
                           </div>
 
                           <div className="admin-time-builder" style={{ marginTop: "0", display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "8px" }}>
-                            <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
-                              <label style={{fontSize: "10px", fontWeight: "600", color: "var(--c-text-muted)", textTransform: "uppercase"}}>Start Time</label>
-                              <input
-                                type="time"
-                                className="admin-time-input"
-                                value={newDayStart}
-                                onChange={(e) => setNewDayStart(e.target.value)}
-                              />
-                            </div>
-                            <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
-                              <label style={{fontSize: "10px", fontWeight: "600", color: "var(--c-text-muted)", textTransform: "uppercase"}}>End Time</label>
-                              <input
-                                type="time"
-                                className="admin-time-input"
-                                value={newDayEnd}
-                                onChange={(e) => setNewDayEnd(e.target.value)}
-                              />
-                            </div>
+                            <TimeInput12h
+                              label="Start Time"
+                              value={newDayStart}
+                              onChange={setNewDayStart}
+                            />
+                            <TimeInput12h
+                              label="End Time"
+                              value={newDayEnd}
+                              onChange={setNewDayEnd}
+                            />
                             <button type="button" className="admin-time-add" onClick={generateDaySlots} style={{alignSelf: "end", height: "38px"}}>
                               Generate
                             </button>
