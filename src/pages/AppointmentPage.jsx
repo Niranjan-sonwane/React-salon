@@ -359,7 +359,7 @@ export default function AppointmentPage() {
                       </span>
                     </div>
                     <div className="appt-booking-rows">
-                      {!dayAvail || dayAvail.services.filter(s => s.totalBooked > 0).length === 0
+                      {!dayAvail || (dayAvail.services?.filter(s => s.totalBooked > 0).length ?? 0) === 0
                         ? <p className="appt-empty-note">No bookings yet for this day. </p>
                         : dayServices.filter(s => (s?.totalBooked || 0) > 0).map(s => (
                             <div key={s.id} className="appt-brow">
