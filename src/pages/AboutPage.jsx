@@ -216,6 +216,11 @@ const styles = `
 function AboutPage() {
   return (
     <>
+      <SEO 
+        title="About Us" 
+        description="Learn more about Dazzler Beauty, Pune's expert salon dedicated to precision artistry, hygiene, and personalized beauty experiences."
+        canonicalUrl="/about"
+      />
       <style>{styles}</style>
 
       <main className="ab-root page-content">

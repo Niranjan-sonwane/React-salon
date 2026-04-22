@@ -1,4 +1,5 @@
 import { useBooking } from "../context/BookingContext"
+import SEO from "../components/SEO"
 
 export default function CoursePage() {
   const { course } = useBooking()
@@ -14,7 +15,13 @@ export default function CoursePage() {
   }
 
   return (
-    <div className="course-page">
+    <>
+      <SEO 
+        title={course.title} 
+        description={`Professional beauty course: ${course.description}. Learn from experts at Dazzler Beauty Academy.`}
+        canonicalUrl="/courses"
+      />
+      <div className="course-page">
       <section className="course-hero">
         <div className="course-hero__overlay" />
         <div className="course-container">
@@ -281,5 +288,6 @@ export default function CoursePage() {
         }
       `}</style>
     </div>
+    </>
   )
 }

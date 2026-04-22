@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useBooking } from "../context/BookingContext"
+import SEO from "../components/SEO"
 import { fetchApi } from "../api"
 
 /*  helpers  */
@@ -169,28 +170,34 @@ export default function AppointmentPage() {
   }
 
   return (
-    <main className="appt-page">
-      {/*  Full-Capacity Alert Modal  */}
-      {fullAlert && (
-        <div className="appt-modal-overlay" onClick={() => setFullAlert(null)}>
-          <div className="appt-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="appt-modal__icon"></div>
-            <h3 className="appt-modal__title">Slot Fully Booked</h3>
-            <p className="appt-modal__body">{fullAlert.message}</p>
-            <button className="appt-modal__btn" onClick={() => setFullAlert(null)}>
-              Choose Another Slot
-            </button>
+    <>
+      <SEO 
+        title="Book Appointment" 
+        description="Book your luxury nail art, cosmetics, or beauty treatment online at Dazzler Beauty, Pune. Fast and easy scheduling."
+        canonicalUrl="/appointment"
+      />
+      <main className="appt-page">
+        {/*  Full-Capacity Alert Modal  */}
+        {fullAlert && (
+          <div className="appt-modal-overlay" onClick={() => setFullAlert(null)}>
+            <div className="appt-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="appt-modal__icon"></div>
+              <h3 className="appt-modal__title">Slot Fully Booked</h3>
+              <p className="appt-modal__body">{fullAlert.message}</p>
+              <button className="appt-modal__btn" onClick={() => setFullAlert(null)}>
+                Choose Another Slot
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/*  Hero Banner  */}
-      <section className="appt-hero" style={{ backgroundImage: "url('/images/nails images/1.jpeg')" }}>
-        <div className="appt-hero__overlay" />
-        <div className="appt-hero__content">
-          <span className="appt-hero__eyebrow">Dazzler Beauty</span>
-          <h1 className="appt-hero__title">Book an Appointment</h1>
-          <p className="appt-hero__sub">Secure your slot with ease. Walk-ins welcome, reservations preferred.</p>
+        {/*  Hero Banner  */}
+        <section className="appt-hero" style={{ backgroundImage: "url('/images/nails images/1.jpeg')" }}>
+          <div className="appt-hero__overlay" />
+          <div className="appt-hero__content">
+            <span className="appt-hero__eyebrow">Dazzler Beauty</span>
+            <h1 className="appt-hero__title">Book an Appointment</h1>
+            <p className="appt-hero__sub">Secure your slot with ease. Walk-ins welcome, reservations preferred.</p>
           <div className="appt-hero__badges">
             <span className="appt-hero__badge">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -644,6 +651,7 @@ export default function AppointmentPage() {
         </div>
       </section>
     </main>
+    </>
   )
 }
 

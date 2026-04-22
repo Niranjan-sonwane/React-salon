@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SEO from '../components/SEO'
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&display=swap');
@@ -235,6 +236,11 @@ export default function ContactPage() {
 
   return (
     <>
+      <SEO 
+        title="Contact Us" 
+        description="Get in touch with Dazzler Beauty for appointments, inquiries about our nail art services, or details on our beauty academy in Pune."
+        canonicalUrl="/contact"
+      />
       <style>{css}</style>
       <div className="lal-root">
 
