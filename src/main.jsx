@@ -26,10 +26,14 @@ window.addEventListener('unhandledrejection', (event) => {
   showBootError('Unhandled promise rejection while loading app', event.reason)
 })
 
+import { HelmetProvider } from 'react-helmet-async'
+
 try {
   createRoot(rootEl).render(
     <StrictMode>
-      <App />
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
     </StrictMode>,
   )
 } catch (err) {

@@ -819,6 +819,8 @@ function Gallery({ images }) {
   )
 }
 
+import SEO from '../components/SEO'
+
 /*  PAGE  */
 function HomePage() {
   const heroSlides = [
@@ -870,6 +872,11 @@ function HomePage() {
 
   return (
     <>
+      <SEO 
+        title="Home" 
+        description="Welcome to Dazzler Beauty, Pune's premier salon for luxury nail art, professional cosmetics, and beauty training."
+        canonicalUrl="/"
+      />
       <style>{CSS}</style>
       <main style={{ background: 'var(--warm)', fontFamily: "'DM Sans', sans-serif" }}>
 

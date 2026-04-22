@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import SEO from '../components/SEO'
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -303,6 +304,11 @@ function PortfolioPage() {
 
   return (
     <>
+      <SEO 
+        title="Portfolio" 
+        description="Explore our gallery of luxury nail art and signature beauty work by Dazzler Beauty, Pune."
+        canonicalUrl="/portfolio"
+      />
       <style>{css}</style>
       <main className="pf-root page-content">
         <section className="pf-hero">
