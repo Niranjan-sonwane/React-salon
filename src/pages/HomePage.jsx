@@ -860,6 +860,8 @@ function HomePage() {
 
   const homePortfolio = [
     '/images/nails images/1.jpeg',  '/images/nails images/12.jpeg', '/images/nails images/13.jpeg',
+    '/images/Jewellery/1.jpeg',     '/images/Jewellery/2.jpeg',     '/images/Jewellery/3.jpeg',
+    '/images/cosmetics/1.jpeg',     '/images/cosmetics/2.jpeg',     '/images/cosmetics/3.jpeg',
     '/images/nails images/2.jpeg',  '/images/nails images/3.jpeg',   '/images/nails images/4.jpeg',
     '/images/nails images/5.jpeg',  '/images/nails images/6.jpeg',   '/images/nails images/7.jpeg',
     '/images/nails images/8.jpeg',  '/images/nails images/9.jpeg',   '/images/nails images/14.jpeg',

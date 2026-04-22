@@ -9,8 +9,8 @@ const serviceLinks = [
 
 const galleryLinks = [
   { to: '/portfolio#nail-art', label: 'Nail Art' },
-  { to: '/portfolio#jewellery', label: 'Jewellery' },
-  { to: '/portfolio#cosmetics', label: 'Cosmetics' },
+  { to: '/gallery#jewellery', label: 'Jewellery' },
+  { to: '/gallery#cosmetics', label: 'Cosmetics' },
 ]
 
 function Navbar() {

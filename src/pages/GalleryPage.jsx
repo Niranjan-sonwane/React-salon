@@ -29,29 +29,7 @@ const css = `
     padding: clamp(62px, 11vw, 132px) clamp(20px, 6vw, 88px) clamp(52px, 9vw, 106px);
     background:
       linear-gradient(120deg, rgba(26, 21, 16, 0.86), rgba(26, 21, 16, 0.56)),
-      url('/images/nails images/1.jpeg') center/cover no-repeat;
-  }
-
-  .pf-hero::before {
-    content: '';
-    position: absolute;
-    right: -90px;
-    top: -110px;
-    width: clamp(220px, 35vw, 450px);
-    height: clamp(220px, 35vw, 450px);
-    border-radius: 50%;
-    border: 1px solid rgba(196, 161, 102, 0.2);
-  }
-
-  .pf-hero::after {
-    content: '';
-    position: absolute;
-    right: -40px;
-    top: -60px;
-    width: clamp(160px, 28vw, 340px);
-    height: clamp(160px, 28vw, 340px);
-    border-radius: 50%;
-    border: 1px solid rgba(196, 161, 102, 0.12);
+      url('/images/cosmetics/3.jpeg') center/cover no-repeat;
   }
 
   .pf-hero-inner {
@@ -215,55 +193,19 @@ const css = `
   }
 
   @media (max-width: 820px) {
-    .pf-intro {
-      grid-template-columns: 1fr;
-      align-items: start;
-      gap: 12px;
-    }
-
-    .pf-grid {
-      grid-template-columns: repeat(6, 1fr);
-    }
-
+    .pf-grid { grid-template-columns: repeat(6, 1fr); }
     .pf-card { grid-column: span 3; }
     .pf-card.is-wide { grid-column: span 6; }
   }
 
   @media (max-width: 580px) {
-    .pf-tag::before,
-    .pf-tag::after {
-      width: 18px;
-    }
-
-    .pf-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .pf-card,
-    .pf-card.is-tall {
-      grid-column: span 1;
-      aspect-ratio: 4 / 5;
-      border-radius: 14px;
-    }
-
-    .pf-card.is-wide {
-      grid-column: span 2;
-      aspect-ratio: 16 / 10;
-      border-radius: 14px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .pf-card,
-    .pf-card img,
-    .pf-card::after {
-      transition: none;
-    }
+    .pf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .pf-card, .pf-card.is-tall { grid-column: span 1; aspect-ratio: 4 / 5; }
+    .pf-card.is-wide { grid-column: span 2; aspect-ratio: 16 / 10; }
   }
 `
 
-function PortfolioPage() {
+function GalleryPage() {
   const { hash } = useLocation()
 
   useEffect(() => {
@@ -275,24 +217,37 @@ function PortfolioPage() {
     }
   }, [hash])
 
-  const nailArtItems = [
-    '/images/nails images/1.jpeg',
-    '/images/nails images/2.jpeg',
-    '/images/nails images/3.jpeg',
-    '/images/nails images/4.jpeg',
-    '/images/nails images/5.jpeg',
-    '/images/nails images/6.jpeg',
-    '/images/nails images/7.jpeg',
-    '/images/nails images/8.jpeg',
-    '/images/nails images/9.jpeg',
-    '/images/nails images/10.jpeg',
-    '/images/nails images/11.jpeg',
-    '/images/nails images/12.jpeg',
-    '/images/nails images/13.jpeg',
-    '/images/nails images/14.jpeg',
-    '/images/nails images/15.jpeg',
-    '/images/nails images/16.jpeg',
-    '/images/nails images/17.jpeg',
+  const jewelleryItems = [
+    '/images/Jewellery/1.jpeg',
+    '/images/Jewellery/2.jpeg',
+    '/images/Jewellery/3.jpeg',
+    '/images/Jewellery/4.jpeg',
+    '/images/Jewellery/5.jpeg',
+    '/images/Jewellery/6.jpeg',
+    '/images/Jewellery/7.jpeg',
+    '/images/Jewellery/8.jpeg',
+    '/images/Jewellery/9.jpeg',
+    '/images/Jewellery/10.jpeg',
+  ]
+
+  const cosmeticsItems = [
+    '/images/cosmetics/1.jpeg',
+    '/images/cosmetics/2.jpeg',
+    '/images/cosmetics/3.jpeg',
+    '/images/cosmetics/4.jpeg',
+    '/images/cosmetics/5.jpeg',
+    '/images/cosmetics/6.jpeg',
+    '/images/cosmetics/7.jpeg',
+    '/images/cosmetics/8.jpeg',
+    '/images/cosmetics/9.jpeg',
+    '/images/cosmetics/10.jpeg',
+    '/images/cosmetics/11.jpeg',
+    '/images/cosmetics/12.jpeg',
+    '/images/cosmetics/13.jpeg',
+    '/images/cosmetics/14.jpeg',
+    '/images/cosmetics/15.jpeg',
+    '/images/cosmetics/16.jpeg',
+    '/images/cosmetics/17.jpeg',
   ]
 
   const tileClass = (index) => {
@@ -307,29 +262,47 @@ function PortfolioPage() {
       <main className="pf-root page-content">
         <section className="pf-hero">
           <div className="pf-hero-inner">
-            <p className="pf-tag">Dazzler Beauty Signature Work</p>
-            <h1 className="pf-title">Portfolio</h1>
+            <p className="pf-tag">Dazzler Beauty Collections</p>
+            <h1 className="pf-title">Gallery</h1>
             <p className="pf-subtitle">
-              Every frame reflects precision artistry, luxury finishes, and results designed to elevate your personal style.
+              A curated collection of our finest work in jewellery styling and professional cosmetics.
             </p>
           </div>
         </section>
 
-        <section className="pf-body pf-anchor" id="nail-art">
+        <section className="pf-body pf-anchor" id="jewellery">
           <div className="pf-intro">
             <div>
-              <h2 className="pf-heading">Nail Art</h2>
+              <h2 className="pf-heading">Jewellery</h2>
               <p className="pf-copy">
-                Explore detailed nail art transformations featuring clean lines, sculpted finishes, and signature designs.
+                View jewellery styling looks with elegant detailing and polished visual balance.
               </p>
             </div>
-            <span className="pf-badge">17 Selected Works</span>
+            <span className="pf-badge">{jewelleryItems.length} Selected Works</span>
           </div>
-
           <div className="pf-grid">
-            {nailArtItems.map((src, index) => (
+            {jewelleryItems.map((src, index) => (
               <figure className={tileClass(index)} key={src}>
-                <img src={src} alt={`Portfolio ${index + 1}`} loading="lazy" />
+                <img src={src} alt={`Jewellery ${index + 1}`} loading="lazy" />
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        <section className="pf-body pf-anchor" id="cosmetics">
+          <div className="pf-intro">
+            <div>
+              <h2 className="pf-heading">Cosmetics</h2>
+              <p className="pf-copy">
+                Discover cosmetics looks focused on clean blends and camera-ready detail.
+              </p>
+            </div>
+            <span className="pf-badge">{cosmeticsItems.length} Selected Works</span>
+          </div>
+          <div className="pf-grid">
+            {cosmeticsItems.map((src, index) => (
+              <figure className={tileClass(index)} key={src}>
+                <img src={src} alt={`Cosmetics ${index + 1}`} loading="lazy" />
               </figure>
             ))}
           </div>
@@ -339,5 +312,4 @@ function PortfolioPage() {
   )
 }
 
-export default PortfolioPage
-
+export default GalleryPage
