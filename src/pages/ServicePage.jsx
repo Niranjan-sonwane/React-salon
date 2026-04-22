@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { services } from '../data/services'
+import SEO from '../components/SEO'
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -396,6 +397,11 @@ function ServicePage() {
 
   return (
     <>
+      <SEO 
+        title={service.title} 
+        description={service.shortDescription}
+        canonicalUrl={`/${service.slug}`}
+      />
       <style>{css}</style>
       <main className="sp-root page-content">
         <section
